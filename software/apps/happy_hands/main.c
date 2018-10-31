@@ -50,23 +50,12 @@ nrf_saadc_value_t sample_value (uint8_t channel) {
     return val;
 }
 
-//raw ADC readings for each finger's flex sensor
-typedef struct {
-    nrf_saadc_value_t sensor_0;
-    nrf_saadc_value_t sensor_1;
-    nrf_saadc_value_t sensor_2;
-    nrf_saadc_value_t sensor_3;
-    nrf_saadc_value_t sensor_4;
-} flex_sensor_readings;
-
-nrf_saadc_value_t flex_sensor_readings[5];
-
-void update_flex_sensor_readings(flex_sensor_readings* readings) {
-    readings->sensor_0 = sample_value(SENSOR_0_ADC_CHANNEL);
-    readings->sensor_1 = sample_value(SENSOR_1_ADC_CHANNEL);
-    readings->sensor_2 = sample_value(SENSOR_2_ADC_CHANNEL);
-    readings->sensor_3 = sample_value(SENSOR_3_ADC_CHANNEL);
-    readings->sensor_4 = sample_value(SENSOR_4_ADC_CHANNEL);
+void update_flex_sensor_readings(nrf_saadc_value_t* readings) {
+    readings[0] = sample_value(SENSOR_0_ADC_CHANNEL);
+    readings[1] = sample_value(SENSOR_1_ADC_CHANNEL);
+    readings[2] = sample_value(SENSOR_2_ADC_CHANNEL);
+    readings[3] = sample_value(SENSOR_3_ADC_CHANNEL);
+    readings[4] = sample_value(SENSOR_4_ADC_CHANNEL);
 }
 
 ret_code_t initialize_rtt() {
@@ -98,10 +87,16 @@ float flex_resistance_kohms(float voltage) {
     return (DIVIDER_RESISTANCE/5 * voltage)/(1 - voltage/5)/1000;
 }
 
-void display_readings(flex_sensor_readings* readings) {
-    float voltage = adc_input_voltage(readings.sensor_0);
-    float resistance = flex_resistance_kohms(voltage);
-    printf("sample_0: %d | %f V | %f kOhms\n", readings.sensor_0, voltage, resistance);
+void display_readings(nrf_saadc_value_t* readings) {
+    int i;
+    float voltage;
+    float resistance;
+    for (i = 0; i < 5; i++) {
+        voltage = adc_input_voltage(readings[i]);
+        resistance = flex_resistance_kohms(voltage);
+        printf("sample %d: %d | %f V | %f kOhms\n", i, readings[i], voltage, resistance);
+
+    }
 }
 
 int main() {
@@ -130,21 +125,21 @@ int main() {
     APP_ERROR_CHECK(error_code);
     error_code = initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
-    
-    flex_sensor_readings readings;
 
+    nrf_saadc_value_t flex_sensor_readings[5];
+   
     nrf_delay_ms(3000);
 
     while (1) {
         printf("Sampling...\n");
-        update_flex_sensor_readings(&readings);
-        display_readings(&readings);
+        update_flex_sensor_readings(flex_sensor_readings);
+        display_readings(flex_sensor_readings);
 
-        printf("sample_0: %d | %f V | %f kOhms\n", readings.sensor_0, adc_input_voltage(readings.sensor_0), flex_resistance_kohms(adc_input_voltage(readings.sensor_0)));
-        printf("sample_1: %d | %f V | %f kOhms\n", readings.sensor_1, adc_input_voltage(readings.sensor_1), flex_resistance_kohms(readings.sensor_1));
-        printf("sample_2: %d | %f V | %f kOhms\n", readings.sensor_2, adc_input_voltage(readings.sensor_2), flex_resistance_kohms(readings.sensor_2));
-        printf("sample_3: %d | %f V | %f kOhms\n", readings.sensor_3, adc_input_voltage(readings.sensor_3), flex_resistance_kohms(readings.sensor_3));
-        printf("sample_4: %d | %f V | %f kOhms\n", readings.sensor_4, adc_input_voltage(readings.sensor_4), flex_resistance_kohms(readings.sensor_4));
+        // printf("sample_0: %d | %f V | %f kOhms\n", readings.sensor_0, adc_input_voltage(readings.sensor_0), flex_resistance_kohms(adc_input_voltage(readings.sensor_0)));
+        // printf("sample_1: %d | %f V | %f kOhms\n", readings.sensor_1, adc_input_voltage(readings.sensor_1), flex_resistance_kohms(readings.sensor_1));
+        // printf("sample_2: %d | %f V | %f kOhms\n", readings.sensor_2, adc_input_voltage(readings.sensor_2), flex_resistance_kohms(readings.sensor_2));
+        // printf("sample_3: %d | %f V | %f kOhms\n", readings.sensor_3, adc_input_voltage(readings.sensor_3), flex_resistance_kohms(readings.sensor_3));
+        // printf("sample_4: %d | %f V | %f kOhms\n", readings.sensor_4, adc_input_voltage(readings.sensor_4), flex_resistance_kohms(readings.sensor_4));
 
         nrf_delay_ms(1000);
     }
