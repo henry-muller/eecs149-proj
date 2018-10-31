@@ -28,6 +28,15 @@ void saadc_callback (nrfx_saadc_evt_t const * p_event) {
     // don't care about adc callbacks
 }
 
+//raw adc readings for each finger's flex sensor
+typedef struct flex_sensor_readings {
+    nrf_saadc_value_t finger1;
+    nrf_saadc_value_t finger2;
+    nrf_saadc_value_t finger3;
+    nrf_saadc_value_t finger4;
+    nrf_saadc_value_t finger5;
+}
+
 // sample a particular analog channel in blocking mode
 nrf_saadc_value_t sample_value (uint8_t channel) {
     nrf_saadc_value_t val;
@@ -73,6 +82,7 @@ int main() {
     // float bend_resistance = 27000.0;
     // float VCC = 5.0;
 
+    
     while (1) {
         printf("Sampling...\n");
         nrf_saadc_value_t sample_0 = sample_value(ADC_CHANNEL_0);
