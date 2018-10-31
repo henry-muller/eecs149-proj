@@ -20,7 +20,8 @@
 
 #include "buckler.h"
 
-#define ADC_CHANNEL 0
+#define ADC_CHANNEL_0 0
+#define ADC_CHANNEL_1 1
 
 // callback for SAADC events
 void saadc_callback (nrfx_saadc_evt_t const * p_event) {
@@ -55,27 +56,33 @@ int main() {
     channel_config.gain = NRF_SAADC_GAIN1_6; // input gain of 1/6 Volts/Volt, multiply incoming signal by (1/6)
     channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL; // 0.6 Volt reference, input after gain can be 0 to 0.6 Volts
 
-     // specify input pin and initialize that ADC channel
+     // initialize ADC channel 0 with pin AIN0
     channel_config.pin_p = NRF_SAADC_INPUT_AIN0;
-    error_code = nrfx_saadc_channel_init(ADC_CHANNEL, &channel_config);
+    error_code = nrfx_saadc_channel_init(ADC_CHANNEL_0, &channel_config);
     APP_ERROR_CHECK(error_code);
 
+    // initialize ADC channel 1 with pin AIN1
+    channel_config.pin_p = NRF_SAADC_INPUT_AIN1;
+    error_code = nrfx_saadc_channel_init(ADC_CHANNEL_1, &channel_config);
+    APP_ERROR_CHECK(error_code);
 
-    float resistor = 47000.0;
-    float straight_resistance = 14000.0;
-    float bend_resistance = 27000.0;
-    float VCC = 5.0;
+    // float resistor = 47000.0;
+    // float straight_resistance = 14000.0;
+    // float bend_resistance = 27000.0;
+    // float VCC = 5.0;
 
     while (1) {
         printf("Sampling...\n");
-        nrf_saadc_value_t sample = sample_value(ADC_CHANNEL);
-        float flexV = sample * VCC / 1023.0;
-        float flexR = resistor * (VCC / (flexV - 1.0));
-        printf("sample: %d\n", sample);
-        printf("resistance: %f\n", flexR);
-        float angle = (flexR - straight_resistance) / 144.4;
-        printf("angle: %f\n", angle);
-        nrf_delay_ms(1);
+        nrf_saadc_value_t sample_0 = sample_value(ADC_CHANNEL_0);
+        nrf_saadc_value_t sample_1 = sample_value(ADC_CHANNEL_1);
+        // float flexV = sample * VCC / 1023.0;
+        // float flexR = resistor * (VCC / (flexV - 1.0));
+        printf("sample_0: %d\n", sample_0);
+        printf("sample_1: %d\n", sample_1);
+        // printf("resistance: %f\n", flexR);
+        // float angle = (flexR - straight_resistance) / 144.4;
+        // printf("angle: %f\n", angle);
+        nrf_delay_ms(1000);
     }
 
 }
