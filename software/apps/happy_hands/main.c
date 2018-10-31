@@ -103,6 +103,7 @@ bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, int* thresholds) 
     return readings[sensor_number] > thresholds[sensor_number];
 }
 
+
 int main() {
     ret_code_t error_code = NRF_SUCCESS;
 
@@ -132,8 +133,17 @@ int main() {
 
     nrf_saadc_value_t flex_sensor_readings[5];
     int thresholds[5];
-   
+
     nrf_delay_ms(3000);
+
+    int i;
+    for (int i = 0; i < 5; i++) {
+      printf("calibrating sensor %d", i);
+      printf("bend finger in approx 90 degree angle");
+      update_flex_sensor_readings(flex_sensor_readings);
+      
+    }
+
 
     while (1) {
         printf("Sampling...\n");
