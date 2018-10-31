@@ -36,6 +36,8 @@ nrf_saadc_value_t sample_value (uint8_t channel) {
     return val;
 }
 
+void update_sensor_readings();
+
 int main() {
     ret_code_t error_code = NRF_SUCCESS;
 
