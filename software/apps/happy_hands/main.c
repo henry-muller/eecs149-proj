@@ -30,6 +30,13 @@
 #define SENSOR_3_ADC_CHANNEL 3
 #define SENSOR_4_ADC_CHANNEL 4
 
+#define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
+// ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
+// ADC_OUTPUT = V * 1137.778
+
+#define DIVIDER_RESISTANCE 47000
+// Resistor value used in every resistive divider with the flex sensors
+
 // callback for SAADC events
 void saadc_callback (nrfx_saadc_evt_t const * p_event) {
     // don't care about adc callbacks
@@ -51,6 +58,8 @@ typedef struct {
     nrf_saadc_value_t sensor_3;
     nrf_saadc_value_t sensor_4;
 } flex_sensor_readings;
+
+nrf_saadc_value_t flex_sensor_readings[5];
 
 void update_flex_sensor_readings(flex_sensor_readings* readings) {
     readings->sensor_0 = sample_value(SENSOR_0_ADC_CHANNEL);
@@ -80,6 +89,21 @@ ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_sa
     return error_code;
 }
 
+float adc_input_voltage(nrf_saadc_value_t adc_reading) {
+    return adc_reading / ADC_SCALING_FACTOR;
+}
+
+float flex_resistance_kohms(float voltage) {
+    // Supply voltage = 5 V. That's where the magic number 5 comes from.
+    return (DIVIDER_RESISTANCE/5 * voltage)/(1 - voltage/5)/1000;
+}
+
+void display_readings(flex_sensor_readings* readings) {
+    float voltage = adc_input_voltage(readings.sensor_0);
+    float resistance = flex_resistance_kohms(voltage);
+    printf("sample_0: %d | %f V | %f kOhms\n", readings.sensor_0, voltage, resistance);
+}
+
 int main() {
     ret_code_t error_code = NRF_SUCCESS;
 
@@ -93,8 +117,8 @@ int main() {
 
     // initialize analog inputs
     nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
-    channel_config.gain = NRF_SAADC_GAIN1_6; // input gain of 1/6 Volts/Volt, multiply incoming signal by (1/6)
-    channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL; // 0.6 Volt reference, input after gain can be 0 to 0.6 Volts
+    channel_config.gain = NRF_SAADC_GAIN1_6;
+    channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL;
 
     error_code = initialize_adc_channel(SENSOR_0_INPUT_PIN, SENSOR_0_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
@@ -106,25 +130,22 @@ int main() {
     APP_ERROR_CHECK(error_code);
     error_code = initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
-
-    // float resistor = 47000.0;
-    // float straight_resistance = 14000.0;
-    // float bend_resistance = 27000.0;
-    // float VCC = 5.0;
     
     flex_sensor_readings readings;
+
+    nrf_delay_ms(3000);
 
     while (1) {
         printf("Sampling...\n");
         update_flex_sensor_readings(&readings);
+        display_readings(&readings);
 
-        // float flexV = sample * VCC / 1023.0;
-        // float flexR = resistor * (VCC / (flexV - 1.0));
-        printf("sample_0: %d\n", readings.sensor_0);
-        printf("sample_1: %d\n", readings.sensor_1);
-        // printf("resistance: %f\n", flexR);
-        // float angle = (flexR - straight_resistance) / 144.4;
-        // printf("angle: %f\n", angle);
+        printf("sample_0: %d | %f V | %f kOhms\n", readings.sensor_0, adc_input_voltage(readings.sensor_0), flex_resistance_kohms(adc_input_voltage(readings.sensor_0)));
+        printf("sample_1: %d | %f V | %f kOhms\n", readings.sensor_1, adc_input_voltage(readings.sensor_1), flex_resistance_kohms(readings.sensor_1));
+        printf("sample_2: %d | %f V | %f kOhms\n", readings.sensor_2, adc_input_voltage(readings.sensor_2), flex_resistance_kohms(readings.sensor_2));
+        printf("sample_3: %d | %f V | %f kOhms\n", readings.sensor_3, adc_input_voltage(readings.sensor_3), flex_resistance_kohms(readings.sensor_3));
+        printf("sample_4: %d | %f V | %f kOhms\n", readings.sensor_4, adc_input_voltage(readings.sensor_4), flex_resistance_kohms(readings.sensor_4));
+
         nrf_delay_ms(1000);
     }
 
