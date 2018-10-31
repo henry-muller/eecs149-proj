@@ -60,11 +60,21 @@ int main() {
     error_code = nrfx_saadc_channel_init(ADC_CHANNEL, &channel_config);
     APP_ERROR_CHECK(error_code);
 
-    // loop forever
+
+    float resistor = 47000.0;
+    float straight_resistance = 14000.0;
+    float bend_resistance = 27000.0;
+    float VCC = 5.0;
+
     while (1) {
         printf("Sampling...\n");
         nrf_saadc_value_t sample = sample_value(ADC_CHANNEL);
+        float flexV = sample * VCC / 1023.0;
+        float flexR = resistor * (VCC / (flexV - 1.0));
         printf("sample: %d\n", sample);
+        printf("resistance: %f\n", flexR);
+        float angle = (flexR - straight_resistance) / 144.4;
+        printf("angle: %f\n", angle);
         nrf_delay_ms(1);
     }
 
