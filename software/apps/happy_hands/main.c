@@ -99,6 +99,10 @@ void display_readings(nrf_saadc_value_t* readings) {
     }
 }
 
+bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, int* thresholds) {
+    return readings[sensor_number] > thresholds[sensor_number];
+}
+
 int main() {
     ret_code_t error_code = NRF_SUCCESS;
 
@@ -112,8 +116,8 @@ int main() {
 
     // initialize analog inputs
     nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
-    channel_config.gain = NRF_SAADC_GAIN1_6;
-    channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL;
+    channel_config.gain = NRF_SAADC_GAIN1_6; // GAIN = 1.6
+    channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL; // REFERENCE = 0.6
 
     error_code = initialize_adc_channel(SENSOR_0_INPUT_PIN, SENSOR_0_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
@@ -127,6 +131,7 @@ int main() {
     APP_ERROR_CHECK(error_code);
 
     nrf_saadc_value_t flex_sensor_readings[5];
+    int thresholds[5];
    
     nrf_delay_ms(3000);
 
@@ -134,12 +139,6 @@ int main() {
         printf("Sampling...\n");
         update_flex_sensor_readings(flex_sensor_readings);
         display_readings(flex_sensor_readings);
-
-        // printf("sample_0: %d | %f V | %f kOhms\n", readings.sensor_0, adc_input_voltage(readings.sensor_0), flex_resistance_kohms(adc_input_voltage(readings.sensor_0)));
-        // printf("sample_1: %d | %f V | %f kOhms\n", readings.sensor_1, adc_input_voltage(readings.sensor_1), flex_resistance_kohms(readings.sensor_1));
-        // printf("sample_2: %d | %f V | %f kOhms\n", readings.sensor_2, adc_input_voltage(readings.sensor_2), flex_resistance_kohms(readings.sensor_2));
-        // printf("sample_3: %d | %f V | %f kOhms\n", readings.sensor_3, adc_input_voltage(readings.sensor_3), flex_resistance_kohms(readings.sensor_3));
-        // printf("sample_4: %d | %f V | %f kOhms\n", readings.sensor_4, adc_input_voltage(readings.sensor_4), flex_resistance_kohms(readings.sensor_4));
 
         nrf_delay_ms(1000);
     }
