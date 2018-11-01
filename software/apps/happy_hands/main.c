@@ -99,10 +99,6 @@ void display_readings(nrf_saadc_value_t* readings) {
     }
 }
 
-bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
-    return readings[sensor_number] > thresholds[sensor_number];
-}
-
 nrf_saadc_value_t get_sensor_threshold(int sensor_number, nrf_saadc_value_t* readings) {
     int i;
     int16_t sum = 0;
@@ -120,8 +116,14 @@ nrf_saadc_value_t get_sensor_threshold(int sensor_number, nrf_saadc_value_t* rea
     return (nrf_saadc_value_t) (sum/count);
 }
 
+bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
+    // Returns true if the ADC reading off the sensor is within 20% of the sensor's calibrated threshold value.
+    return 0.8 * thresholds[sensor_number] <= readings[sensor_number] && readings[sensor_number] < 1.2 * thresholds[sensor_number];
+}
+
 
 int main() {
+    //----------Initialization stuff--------------------------------------------------------------------------------
     ret_code_t error_code = NRF_SUCCESS;
 
     // initialize RTT library
@@ -147,37 +149,41 @@ int main() {
     APP_ERROR_CHECK(error_code);
     error_code = initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
+    //----------End initialization stuff-----------------------------------------------------------------------------
 
+    // Initialize readings / thresholds holder arrays
     nrf_saadc_value_t flex_sensor_readings[5];
-    int thresholds[5];
+    nrf_saadc_value_t flex_sensor_thresholds[5];
+
+    nrf_delay_ms(10000);
+    printf("RTT working...\n");
+    nrf_delay_ms(5000);
+
+    // Calibrate sensors
+    int i;
+    for (i = 0; i < 5; i++) {
+        flex_sensor_thresholds[i] = get_sensor_threshold(i, flex_sensor_readings);
+        printf("Calibration of sensor %d completed.\n", i);
+        nrf_delay_ms(2000);
+    }
+
+    for (i = 0; i < 5; i++) {
+        printf("thresholds[%d] = %d\n", i, flex_sensor_thresholds[i]);
+    }
 
     nrf_delay_ms(3000);
-
-    int i;
-    int j;
-    int total = 0;
-    for (i = 0; i < 5; i++) {
-        printf("Calibrating sensor %d...\n", i);
-        printf("Bend finger in approx. 90 degree angle\n");
-        for (j = 0; j < 5; j++) {
-            printf("Reading from sensor %d...\n", i);
-            update_flex_sensor_readings(flex_sensor_readings);
-            display_readings(flex_sensor_readings);
-            total += flex_sensor_readings[i];
-            nrf_delay_ms(5000);
-        }
-        thresholds[i] = total/5;
-        printf("thresholds[%d] = %d\n", i, thresholds[i]);
-    }
-
-    for (i = 0; i < 5; i++) {
-        printf("thresholds[%d] = %d\n", i, thresholds[i]);
-    }
 
     while (1) {
         printf("Sampling...\n");
         update_flex_sensor_readings(flex_sensor_readings);
         display_readings(flex_sensor_readings);
+        for (i = 0; i < 5; i++) {
+            if (is_flexed(i, flex_sensor_readings, flex_sensor_thresholds)) {
+                printf("%d 1\n", i); // Indicate which sensors are flexed
+            } else {
+                printf("%d 0\n", i);
+            }
+        }
 
         nrf_delay_ms(1000);
     }
