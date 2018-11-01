@@ -99,8 +99,25 @@ void display_readings(nrf_saadc_value_t* readings) {
     }
 }
 
-bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, int* thresholds) {
+bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
     return readings[sensor_number] > thresholds[sensor_number];
+}
+
+nrf_saadc_value_t get_sensor_threshold(int sensor_number, nrf_saadc_value_t* readings) {
+    int i;
+    int16_t sum = 0;
+    int16_t count = 5;
+    printf("Calibrating sensor %d...\n", sensor_number);
+    printf("Bend corresponding finger in approx. 90 degree angle\n");
+    nrf_delay_ms(2000);
+    for (i = 0; i < count; i++) {
+        printf("Reading from sensor %d...\n", sensor_number);
+        update_flex_sensor_readings(readings);
+        display_readings(readings);
+        sum += readings[sensor_number];
+        nrf_delay_ms(5000);
+    }
+    return (nrf_saadc_value_t) (sum/count);
 }
 
 
@@ -137,13 +154,25 @@ int main() {
     nrf_delay_ms(3000);
 
     int i;
-    for (int i = 0; i < 5; i++) {
-      printf("calibrating sensor %d", i);
-      printf("bend finger in approx 90 degree angle");
-      update_flex_sensor_readings(flex_sensor_readings);
-      
+    int j;
+    int total = 0;
+    for (i = 0; i < 5; i++) {
+        printf("Calibrating sensor %d...\n", i);
+        printf("Bend finger in approx. 90 degree angle\n");
+        for (j = 0; j < 5; j++) {
+            printf("Reading from sensor %d...\n", i);
+            update_flex_sensor_readings(flex_sensor_readings);
+            display_readings(flex_sensor_readings);
+            total += flex_sensor_readings[i];
+            nrf_delay_ms(5000);
+        }
+        thresholds[i] = total/5;
+        printf("thresholds[%d] = %d\n", i, thresholds[i]);
     }
 
+    for (i = 0; i < 5; i++) {
+        printf("thresholds[%d] = %d\n", i, thresholds[i]);
+    }
 
     while (1) {
         printf("Sampling...\n");
