@@ -37,6 +37,8 @@
 #define DIVIDER_RESISTANCE 47000
 // Resistor value used in every resistive divider with the flex sensors
 
+#define NUMBER_OF_SENSORS 5
+
 // callback for SAADC events
 void saadc_callback (nrfx_saadc_evt_t const * p_event) {
     // don't care about adc callbacks
@@ -91,7 +93,7 @@ void display_readings(nrf_saadc_value_t* readings) {
     int i;
     float voltage;
     float resistance;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
         voltage = adc_input_voltage(readings[i]);
         resistance = flex_resistance_kohms(voltage);
         printf("sample %d: %d | %f V | %f kOhms\n", i, readings[i], voltage, resistance);
@@ -114,6 +116,29 @@ nrf_saadc_value_t get_sensor_threshold(int sensor_number, nrf_saadc_value_t* rea
         nrf_delay_ms(5000);
     }
     return (nrf_saadc_value_t) (sum/count);
+}
+
+void update_sensor_thresholds(nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
+    int i;
+    int j;
+    int16_t sums[NUMBER_OF_SENSORS];
+    int16_t count = 1000; // number of samples to take
+    printf("Preparing to calibrate sensors. Please bend all fingers.\n");
+    nrf_delay_ms(2000);
+    printf("Calibrating...\n")
+    for (i = 0; i < count; i++) {
+        update_flex_sensor_readings(readings);
+        for (j = 0; j < NUMBER_OF_SENSORS; j++) {
+            sums[j] += readings[j]
+        }
+    }
+    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+        thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
+    }
+    printf("Calibration complete.\n");
+    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+        printf("Sensor %d threshold: %d\n", i, thresholds[i]);
+    }
 }
 
 bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
@@ -152,16 +177,17 @@ int main() {
     //----------End initialization stuff-----------------------------------------------------------------------------
 
     // Initialize readings / thresholds holder arrays
-    nrf_saadc_value_t flex_sensor_readings[5];
-    nrf_saadc_value_t flex_sensor_thresholds[5];
+    nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
+    nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
 
     nrf_delay_ms(10000);
     printf("RTT working...\n");
     nrf_delay_ms(5000);
 
     // Calibrate sensors
+    /*
     int i;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
         flex_sensor_thresholds[i] = get_sensor_threshold(i, flex_sensor_readings);
         printf("Calibration of sensor %d completed.\n", i);
         nrf_delay_ms(2000);
@@ -170,6 +196,9 @@ int main() {
     for (i = 0; i < 5; i++) {
         printf("thresholds[%d] = %d\n", i, flex_sensor_thresholds[i]);
     }
+    */
+
+   update_sensor_thresholds(flex_sensor_readings, flex_sensor_thresholds);
 
     nrf_delay_ms(3000);
 
@@ -177,7 +206,7 @@ int main() {
         printf("Sampling...\n");
         update_flex_sensor_readings(flex_sensor_readings);
         display_readings(flex_sensor_readings);
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < NUMBER_OF_SENSORS; i++) {
             if (is_flexed(i, flex_sensor_readings, flex_sensor_thresholds)) {
                 printf("%d 1\n", i); // Indicate which sensors are flexed
             } else {
