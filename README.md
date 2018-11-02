@@ -1,10 +1,8 @@
 # eecs149-proj
 Flex Sensor Project to play music
 
-Right hand:
+Happy Hands is a musical instrument that can be played using only your own two hands!
 
-12 notes with different finger positions
-(maybe chords too)
+Use your 8 fingers to play the 8 primary notes and your thumbs to pitch bend. You can also set the key with a rotary switch and tilt your hands to control amplitude.
 
-Left hand:
-accelerometer that controls volume (up/down)
+
