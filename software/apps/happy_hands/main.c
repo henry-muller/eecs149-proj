@@ -35,12 +35,12 @@
 #define NUMBER_OF_SENSORS 5
 
 // callback for SAADC events
-void saadc_callback (nrfx_saadc_evt_t const * p_event) {
+void saadc_callback(nrfx_saadc_evt_t const * p_event) {
     // don't care about adc callbacks
 }
 
 // sample a particular analog channel in blocking mode
-nrf_saadc_value_t sample_value (uint8_t channel) {
+nrf_saadc_value_t sample_value(uint8_t channel) {
     nrf_saadc_value_t val;
     ret_code_t error_code = nrfx_saadc_sample_convert(channel, &val);
     APP_ERROR_CHECK(error_code);
@@ -116,18 +116,23 @@ nrf_saadc_value_t get_sensor_threshold(int sensor_number, nrf_saadc_value_t* rea
 void update_sensor_thresholds(nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
     int i;
     int j;
-    int16_t sums[NUMBER_OF_SENSORS];
-    int16_t count = 1000; // number of samples to take
+    int32_t sums[NUMBER_OF_SENSORS];
+    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+        sums[i] = 0;
+    }
+    int32_t count = 10; // number of samples to take
     printf("Preparing to calibrate sensors. Please bend all fingers.\n");
     nrf_delay_ms(2000);
-    printf("Calibrating...\n")
+    printf("Calibrating...\n");
     for (i = 0; i < count; i++) {
         update_flex_sensor_readings(readings);
         for (j = 0; j < NUMBER_OF_SENSORS; j++) {
-            sums[j] += readings[j]
+            sums[j] += readings[j];
+            nrf_delay_ms(10);
         }
     }
     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+        printf("SUMS[%d], = %d\n", i, sums[i]);
         thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
     }
     printf("Calibration complete.\n");
@@ -174,28 +179,15 @@ int main() {
     // Initialize readings / thresholds holder arrays
     nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
     nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
+    int i;
 
-    nrf_delay_ms(10000);
+    nrf_delay_ms(2000);
     printf("RTT working...\n");
-    nrf_delay_ms(5000);
 
     // Calibrate sensors
-    /*
-    int i;
-    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        flex_sensor_thresholds[i] = get_sensor_threshold(i, flex_sensor_readings);
-        printf("Calibration of sensor %d completed.\n", i);
-        nrf_delay_ms(2000);
-    }
+    update_sensor_thresholds(flex_sensor_readings, flex_sensor_thresholds);
 
-    for (i = 0; i < 5; i++) {
-        printf("thresholds[%d] = %d\n", i, flex_sensor_thresholds[i]);
-    }
-    */
-
-   update_sensor_thresholds(flex_sensor_readings, flex_sensor_thresholds);
-
-    nrf_delay_ms(3000);
+    nrf_delay_ms(5000);
 
     while (1) {
         printf("Sampling...\n");
