@@ -96,23 +96,6 @@ void display_readings(nrf_saadc_value_t* readings) {
     }
 }
 
-nrf_saadc_value_t get_sensor_threshold(int sensor_number, nrf_saadc_value_t* readings) {
-    int i;
-    int16_t sum = 0;
-    int16_t count = 5;
-    printf("Calibrating sensor %d...\n", sensor_number);
-    printf("Bend corresponding finger in approx. 90 degree angle\n");
-    nrf_delay_ms(2000);
-    for (i = 0; i < count; i++) {
-        printf("Reading from sensor %d...\n", sensor_number);
-        update_flex_sensor_readings(readings);
-        display_readings(readings);
-        sum += readings[sensor_number];
-        nrf_delay_ms(5000);
-    }
-    return (nrf_saadc_value_t) (sum/count);
-}
-
 void update_sensor_thresholds(nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
     int i;
     int j;
@@ -132,20 +115,14 @@ void update_sensor_thresholds(nrf_saadc_value_t* readings, nrf_saadc_value_t* th
         }
     }
     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        printf("SUMS[%d], = %d\n", i, sums[i]);
         thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
-    }
-    printf("Calibration complete.\n");
-    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        printf("Sensor %d threshold: %d\n", i, thresholds[i]);
     }
 }
 
 bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
-    // Returns true if the ADC reading off the sensor is within 20% of the sensor's calibrated threshold value.
-    return 0.8 * thresholds[sensor_number] <= readings[sensor_number] && readings[sensor_number] < 1.2 * thresholds[sensor_number];
+    // Returns true if the ADC reading off the sensor is above 80% of the sensor's calibrated threshold value.
+    return readings[sensor_number] >= 0.8 * thresholds[sensor_number];
 }
-
 
 int main() {
     //----------Initialization stuff--------------------------------------------------------------------------------
@@ -190,18 +167,11 @@ int main() {
     nrf_delay_ms(5000);
 
     while (1) {
-        printf("Sampling...\n");
         update_flex_sensor_readings(flex_sensor_readings);
-        display_readings(flex_sensor_readings);
         for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-            if (is_flexed(i, flex_sensor_readings, flex_sensor_thresholds)) {
-                printf("%d 1\n", i); // Indicate which sensors are flexed
-            } else {
-                printf("%d 0\n", i);
-            }
+            printf("%d ", is_flexed(i, flex_sensor_readings, flex_sensor_thresholds));
         }
-
-        nrf_delay_ms(1000);
+        printf("\n");
+        nrf_delay_ms(1);
     }
-
 }
