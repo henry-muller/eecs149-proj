@@ -17,10 +17,19 @@
 #include "nrfx_saadc.h"
 #include "nrf_drv_pwm.h"
 //#include "nrf_drv_clock.h"
-#include "nrfx_pwm.h"
+//#include "nrfx_pwm.h"
 
 #include "buckler.h"
-#include "pin_assignments.h"
+// #include "pin_assignments.h"
+
+//define flex sensor readout pins
+#define SENSOR_0_INPUT_PIN NRF_SAADC_INPUT_AIN0
+#define SENSOR_1_INPUT_PIN NRF_SAADC_INPUT_AIN1
+#define SENSOR_2_INPUT_PIN NRF_SAADC_INPUT_AIN2
+#define SENSOR_3_INPUT_PIN NRF_SAADC_INPUT_AIN3
+#define SENSOR_4_INPUT_PIN NRF_SAADC_INPUT_AIN4
+
+uint8_t PWM_OUTPUT_PIN = NRF_GPIO_PIN_MAP(0, 17);
 
 #define SENSOR_0_ADC_CHANNEL 0
 #define SENSOR_1_ADC_CHANNEL 1
@@ -31,7 +40,6 @@
 #define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
 // ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
 // ADC_OUTPUT = V * 1137.778
-
 #define DIVIDER_RESISTANCE 47000
 // Resistor value used in every resistive divider with the flex sensors
 
@@ -39,16 +47,13 @@
 
 uint8_t OUTPUT_PIN = NRF_GPIO_PIN_MAP(0, 17);
 
-nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
-nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
-bool is_flexed[NUMBER_OF_SENSORS];
+static nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
+static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
+static bool is_flexed[NUMBER_OF_SENSORS];
 
-// callback for SAADC events
-void saadc_callback(nrfx_saadc_evt_t const * p_event) {
-    // don't care about adc callbacks
-}
+void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
 
-// sample a particular analog channel in blocking mode
+// Sample a particular analog channel in blocking mode
 nrf_saadc_value_t sample_value(uint8_t channel) {
     nrf_saadc_value_t val;
     ret_code_t error_code = nrfx_saadc_sample_convert(channel, &val);
@@ -78,7 +83,6 @@ ret_code_t initialize_adc() {
 }
 
 ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config) {
-    // initialize ADC channel 0 with pin AIN0
     channel_config.pin_p = pin;
     ret_code_t error_code = nrfx_saadc_channel_init(channel, &channel_config);
     return error_code;
@@ -140,60 +144,53 @@ void update_flexed() {
     }
 }
 
-static nrf_drv_pwm_t pwm_0 = NRF_DRV_PWM_INSTANCE(0);
-nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
-nrf_pwm_sequence_t const seq =
+nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0);
+nrf_pwm_values_individual_t pwm_duty_cycle_sequence_values[] = {{25}};
+nrf_pwm_sequence_t const pwm_duty_cycle_sequence =
 {
-    .values.p_individual = seq_values,
-    .length          = NRF_PWM_VALUES_LENGTH(seq_values),
-    .repeats         = 0,
-    .end_delay       = 0
+    .values.p_individual = pwm_duty_cycle_sequence_values,
+    .length              = NRF_PWM_VALUES_LENGTH(pwm_duty_cycle_sequence_values),
+    .repeats             = 0,
+    .end_delay           = 0
 };
 
-void pwm_update_duty_cycle(uint8_t duty_cycle)
-{
-    
-    // Check if value is outside of range. If so, set to 100%
-    if(duty_cycle >= 100)
-    {
-        seq_values->channel_0 = 100;
-    }
-    else
-    {
-        seq_values->channel_0 = duty_cycle;
-    }
-    
-    nrf_drv_pwm_simple_playback(&pwm_0, &seq, 1, NRF_DRV_PWM_FLAG_LOOP);
-}
-
-
-static void pwm_init(void)
-{
-    nrf_drv_pwm_config_t const config0 =
+void pwm_init() {
+    nrf_drv_pwm_config_t const pwm_config =
     {
         .output_pins =
         {
-            OUTPUT_PIN, // channel 0
-            NRF_DRV_PWM_PIN_NOT_USED,             // channel 1
-            NRF_DRV_PWM_PIN_NOT_USED,             // channel 2
-            NRF_DRV_PWM_PIN_NOT_USED,             // channel 3
+            OUTPUT_PIN,               // channel 0
+            NRF_DRV_PWM_PIN_NOT_USED, // channel 1
+            NRF_DRV_PWM_PIN_NOT_USED, // channel 2
+            NRF_DRV_PWM_PIN_NOT_USED, // channel 3
         },
         .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_250kHz,
+        .base_clock   = NRF_PWM_CLK_125kHz,
         .count_mode   = NRF_PWM_MODE_UP,
-        .top_value    = 100,
+        .top_value    = 478, // ticks per period
         .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
         .step_mode    = NRF_PWM_STEP_AUTO
     };
     // Init PWM without error handler
-    APP_ERROR_CHECK(nrf_drv_pwm_init(&pwm_0, &config0, NULL));
-    
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&pwm, &pwm_config, NULL));
 }
 
+void pwm_start(/*float frequency_hz*/) {
+    nrf_drv_pwm_simple_playback(&pwm, &pwm_duty_cycle_sequence, 1, NRF_DRV_PWM_FLAG_LOOP);
+}
 
-nrf_drv_pwm_config_t pwm_config = NRFX_PWM_DEFAULT_CONFIG;
-NRFX_PWM_DEFAULT_CONFIG_OUT0_PIN
+int frequency_to_top_value(float frequency_hz) {
+    // Assuming base_clock = NRF_PWM_CLK_125kHz
+    float base_clock_frequency = 250000;
+    float top_value = base_clock_frequency / frequency_hz;
+    return (int) top_value;
+}
 
+/*
+void pwm_update_duty_cycle(uint8_t duty_cycle) {
+    pwm_duty_cycle_sequence_values->channel_0 = duty_cycle;
+    nrf_drv_pwm_simple_playback(&pwm_0, &pwm_duty_cycle_sequence, 1, NRF_DRV_PWM_FLAG_LOOP);
+}*/
 
 int main() {
     //----------Initialization stuff--------------------------------------------------------------------------------
@@ -224,6 +221,7 @@ int main() {
     APP_ERROR_CHECK(error_code);
     //----------End initialization stuff-----------------------------------------------------------------------------
 
+    /*
     // initialize GPIO driver
     if (!nrfx_gpiote_is_init()) {
         error_code = nrfx_gpiote_init();
@@ -238,57 +236,15 @@ int main() {
     APP_ERROR_CHECK(error_code);
     error_code = nrfx_gpiote_out_init(led2, &out_config);
     APP_ERROR_CHECK(error_code);
+    */
     
     // Start clock for accurate frequencies
     NRF_CLOCK->TASKS_HFCLKSTART = 1; 
     // Wait for clock to start
-    while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) 
-        ;
+    while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
     
     pwm_init();
-
-    /*
-    for (;;)
-    {
-        for(int i = 0; i <= 100; i++)
-        {
-            nrf_delay_ms(10);
-            pwm_update_duty_cycle(i);
-        }
-    }*/
-
-    pwm_update_duty_cycle(50);
-    
-    /*
-    while(1) {
-        nrf_gpio_pin_toggle(led1);
-        nrf_gpio_pin_toggle(led2);
-        nrf_delay_ms(400);
-        printf("HELLO\n");
-    } */
-    
-    /*
-    APP_PWM_INSTANCE(PWM0, 1);
-    app_pwm_config_t pwm0_config = APP_PWM_DEFAULT_CONFIG_1CH(5000L, 17);
-    error_code = app_pwm_init(&PWM0, &pwm0_config, pwm_ready_callback);
-    APP_ERROR_CHECK(error_code);
-    app_pwm_enable(&PWM0);
-    uint32_t value;
-    printf("You should see this\n");
-    while(true)
-    {
-        for (uint8_t i = 0; i < 40; ++i)
-        {
-            value = (i < 20) ? (i * 5) : (100 - (i - 20) * 5);
-            
-            // Set the duty cycle - keep trying until PWM is ready. 
-            while (app_pwm_channel_duty_set(&PWM0, 0, value) == NRF_ERROR_BUSY);
-            nrf_delay_ms(25);
-        }
-    }
-    printf("You should not see this\n");
-    */
-
+    pwm_start();
 
     int i;
     nrf_delay_ms(2000);
