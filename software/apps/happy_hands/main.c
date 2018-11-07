@@ -15,6 +15,7 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
+#include "app_pwm.h"
 
 #include "buckler.h"
 #include "pin_assignments.h"
@@ -34,6 +35,15 @@
 
 #define NUMBER_OF_SENSORS 5
 
+nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
+nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
+bool is_flexed[NUMBER_OF_SENSORS];
+
+//--------PWM stuff----
+void pwm_ready_callback(uint32_t pwm_id) {
+}
+//---------------------
+
 // callback for SAADC events
 void saadc_callback(nrfx_saadc_evt_t const * p_event) {
     // don't care about adc callbacks
@@ -47,12 +57,12 @@ nrf_saadc_value_t sample_value(uint8_t channel) {
     return val;
 }
 
-void update_flex_sensor_readings(nrf_saadc_value_t* readings) {
-    readings[0] = sample_value(SENSOR_0_ADC_CHANNEL);
-    readings[1] = sample_value(SENSOR_1_ADC_CHANNEL);
-    readings[2] = sample_value(SENSOR_2_ADC_CHANNEL);
-    readings[3] = sample_value(SENSOR_3_ADC_CHANNEL);
-    readings[4] = sample_value(SENSOR_4_ADC_CHANNEL);
+void update_flex_sensor_readings() {
+    flex_sensor_readings[0] = sample_value(SENSOR_0_ADC_CHANNEL);
+    flex_sensor_readings[1] = sample_value(SENSOR_1_ADC_CHANNEL);
+    flex_sensor_readings[2] = sample_value(SENSOR_2_ADC_CHANNEL);
+    flex_sensor_readings[3] = sample_value(SENSOR_3_ADC_CHANNEL);
+    flex_sensor_readings[4] = sample_value(SENSOR_4_ADC_CHANNEL);
 }
 
 ret_code_t initialize_rtt() {
@@ -84,19 +94,19 @@ float flex_resistance_kohms(float voltage) {
     return (DIVIDER_RESISTANCE/5 * voltage)/(1 - voltage/5)/1000;
 }
 
-void display_readings(nrf_saadc_value_t* readings) {
+void display_readings() {
     int i;
     float voltage;
     float resistance;
     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        voltage = adc_input_voltage(readings[i]);
+        voltage = adc_input_voltage(flex_sensor_readings[i]);
         resistance = flex_resistance_kohms(voltage);
-        printf("sample %d: %d | %f V | %f kOhms\n", i, readings[i], voltage, resistance);
+        printf("sample %d: %d | %f V | %f kOhms\n", i, flex_sensor_readings[i], voltage, resistance);
 
     }
 }
 
-void update_sensor_thresholds(nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
+void update_sensor_thresholds() {
     int i;
     int j;
     int32_t sums[NUMBER_OF_SENSORS];
@@ -108,21 +118,29 @@ void update_sensor_thresholds(nrf_saadc_value_t* readings, nrf_saadc_value_t* th
     nrf_delay_ms(2000);
     printf("Calibrating...\n");
     for (i = 0; i < count; i++) {
-        update_flex_sensor_readings(readings);
+        update_flex_sensor_readings();
         for (j = 0; j < NUMBER_OF_SENSORS; j++) {
-            sums[j] += readings[j];
+            sums[j] += flex_sensor_readings[j];
             nrf_delay_ms(10);
         }
     }
     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
+        flex_sensor_thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
     }
 }
 
-bool is_flexed(int sensor_number, nrf_saadc_value_t* readings, nrf_saadc_value_t* thresholds) {
+bool is_single_sensor_flexed(int sensor_number) {
     // Returns true if the ADC reading off the sensor is above 80% of the sensor's calibrated threshold value.
-    return readings[sensor_number] >= 0.8 * thresholds[sensor_number];
+    return flex_sensor_readings[sensor_number] >= 0.8 * flex_sensor_thresholds[sensor_number];
 }
+
+void update_flexed() {
+    int i;
+    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+        is_flexed[i] = is_single_sensor_flexed(i);
+    }
+}
+
 
 int main() {
     //----------Initialization stuff--------------------------------------------------------------------------------
@@ -153,11 +171,28 @@ int main() {
     APP_ERROR_CHECK(error_code);
     //----------End initialization stuff-----------------------------------------------------------------------------
 
-    // Initialize readings / thresholds holder arrays
-    nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
-    nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
-    int i;
+    //PWM test
+    /*
+    APP_PWM_INSTANCE(PWM0, 0);
+    app_pwm_config_t pwm0_config = APP_PWM_DEFAULT_CONFIG_1CH(5000L, NRF_GPIO_PIN_MAP(0, 17));
+    error_code = app_pwm_init(&PWM0, &pwm0_config, pwm_ready_callback);
+    APP_ERROR_CHECK(error_code);
+    app_pwm_enable(&PWM0);
+    uint32_t value;
+    while(true)
+    {
+        for (uint8_t i = 0; i < 40; ++i)
+        {
+            value = (i < 20) ? (i * 5) : (100 - (i - 20) * 5);
+            
+            // Set the duty cycle - keep trying until PWM is ready. 
+            while (app_pwm_channel_duty_set(&PWM0, 0, value) == NRF_ERROR_BUSY);
+            nrf_delay_ms(25);
+        }
+    }
+    */
 
+    int i;
     nrf_delay_ms(2000);
     printf("RTT working...\n");
 
@@ -167,9 +202,10 @@ int main() {
     nrf_delay_ms(5000);
 
     while (1) {
-        update_flex_sensor_readings(flex_sensor_readings);
+        update_flex_sensor_readings();
+        update_flexed();
         for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-            printf("%d ", is_flexed(i, flex_sensor_readings, flex_sensor_thresholds));
+            printf("%d ", is_flexed[i]);
         }
         printf("\n");
         nrf_delay_ms(1);
