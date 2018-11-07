@@ -15,7 +15,9 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
-#include "app_pwm.h"
+#include "nrf_drv_pwm.h"
+//#include "nrf_drv_clock.h"
+#include "nrfx_pwm.h"
 
 #include "buckler.h"
 #include "pin_assignments.h"
@@ -35,14 +37,11 @@
 
 #define NUMBER_OF_SENSORS 5
 
+uint8_t OUTPUT_PIN = NRF_GPIO_PIN_MAP(0, 17);
+
 nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
 nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
 bool is_flexed[NUMBER_OF_SENSORS];
-
-//--------PWM stuff----
-void pwm_ready_callback(uint32_t pwm_id) {
-}
-//---------------------
 
 // callback for SAADC events
 void saadc_callback(nrfx_saadc_evt_t const * p_event) {
@@ -141,6 +140,56 @@ void update_flexed() {
     }
 }
 
+static nrf_drv_pwm_t m_pwm0 = NRF_DRV_PWM_INSTANCE(0);
+nrf_pwm_values_individual_t seq_values[] = {0, 0, 0, 0};
+nrf_pwm_sequence_t const seq =
+{
+    .values.p_individual = seq_values,
+    .length          = NRF_PWM_VALUES_LENGTH(seq_values),
+    .repeats         = 0,
+    .end_delay       = 0
+};
+
+void pwm_update_duty_cycle(uint8_t duty_cycle)
+{
+    
+    // Check if value is outside of range. If so, set to 100%
+    if(duty_cycle >= 100)
+    {
+        seq_values->channel_0 = 100;
+    }
+    else
+    {
+        seq_values->channel_0 = duty_cycle;
+    }
+    
+    nrf_drv_pwm_simple_playback(&m_pwm0, &seq, 1, NRF_DRV_PWM_FLAG_LOOP);
+}
+
+static void pwm_init(void)
+{
+    nrf_drv_pwm_config_t const config0 =
+    {
+        .output_pins =
+        {
+            OUTPUT_PIN, // channel 0
+            NRF_DRV_PWM_PIN_NOT_USED,             // channel 1
+            NRF_DRV_PWM_PIN_NOT_USED,             // channel 2
+            NRF_DRV_PWM_PIN_NOT_USED,             // channel 3
+        },
+        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+        .base_clock   = NRF_PWM_CLK_1MHz,
+        .count_mode   = NRF_PWM_MODE_UP,
+        .top_value    = 100,
+        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+        .step_mode    = NRF_PWM_STEP_AUTO
+    };
+    // Init PWM without error handler
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&m_pwm0, &config0, NULL));
+    
+}
+
+
 
 int main() {
     //----------Initialization stuff--------------------------------------------------------------------------------
@@ -171,14 +220,54 @@ int main() {
     APP_ERROR_CHECK(error_code);
     //----------End initialization stuff-----------------------------------------------------------------------------
 
-    //PWM test
+    // initialize GPIO driver
+    if (!nrfx_gpiote_is_init()) {
+        error_code = nrfx_gpiote_init();
+    }
+    APP_ERROR_CHECK(error_code);
+    
+    uint8_t led1 = NRF_GPIO_PIN_MAP(0, 17);
+    uint8_t led2 = NRF_GPIO_PIN_MAP(0, 18);
+
+    nrfx_gpiote_out_config_t out_config = NRFX_GPIOTE_CONFIG_OUT_SIMPLE(true);
+    error_code = nrfx_gpiote_out_init(led1, &out_config);
+    APP_ERROR_CHECK(error_code);
+    error_code = nrfx_gpiote_out_init(led2, &out_config);
+    APP_ERROR_CHECK(error_code);
+    
+    // Start clock for accurate frequencies
+    NRF_CLOCK->TASKS_HFCLKSTART = 1; 
+    // Wait for clock to start
+    while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) 
+        ;
+    
+    pwm_init();
+
+    for (;;)
+    {
+        for(int i = 0; i <= 100; i++)
+        {
+            nrf_delay_ms(10);
+            pwm_update_duty_cycle(i);
+        }
+    }
+    
     /*
-    APP_PWM_INSTANCE(PWM0, 0);
-    app_pwm_config_t pwm0_config = APP_PWM_DEFAULT_CONFIG_1CH(5000L, NRF_GPIO_PIN_MAP(0, 17));
+    while(1) {
+        nrf_gpio_pin_toggle(led1);
+        nrf_gpio_pin_toggle(led2);
+        nrf_delay_ms(400);
+        printf("HELLO\n");
+    } */
+    
+    /*
+    APP_PWM_INSTANCE(PWM0, 1);
+    app_pwm_config_t pwm0_config = APP_PWM_DEFAULT_CONFIG_1CH(5000L, 17);
     error_code = app_pwm_init(&PWM0, &pwm0_config, pwm_ready_callback);
     APP_ERROR_CHECK(error_code);
     app_pwm_enable(&PWM0);
     uint32_t value;
+    printf("You should see this\n");
     while(true)
     {
         for (uint8_t i = 0; i < 40; ++i)
@@ -190,7 +279,9 @@ int main() {
             nrf_delay_ms(25);
         }
     }
+    printf("You should not see this\n");
     */
+
 
     int i;
     nrf_delay_ms(2000);

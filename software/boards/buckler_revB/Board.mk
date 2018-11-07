@@ -79,6 +79,10 @@ BOARD_SOURCES += \
 	simple_logger.c\
 	ff.c\
 	mmc_nrf.c\
+	app_pwm.c\
+	nrfx_ppi.c\
+	nrf_drv_ppi.c\
+	nrfx_pwm.c\
 
 ifneq ($(SOFTDEVICE_MODEL),blank)
 BOARD_SOURCES += nrf_sdh.c
