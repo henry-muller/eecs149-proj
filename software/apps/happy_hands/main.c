@@ -29,8 +29,6 @@
 #define SENSOR_3_INPUT_PIN NRF_SAADC_INPUT_AIN3
 #define SENSOR_4_INPUT_PIN NRF_SAADC_INPUT_AIN4
 
-uint8_t PWM_OUTPUT_PIN = NRF_GPIO_PIN_MAP(0, 17);
-
 #define SENSOR_0_ADC_CHANNEL 0
 #define SENSOR_1_ADC_CHANNEL 1
 #define SENSOR_2_ADC_CHANNEL 2
@@ -45,13 +43,35 @@ uint8_t PWM_OUTPUT_PIN = NRF_GPIO_PIN_MAP(0, 17);
 
 #define NUMBER_OF_SENSORS 5
 
-uint8_t OUTPUT_PIN = NRF_GPIO_PIN_MAP(0, 17);
+#define PWM_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
+
+// Don't look at this next line if you value your sanity
+#define PWM_CONFIG(frequency_hz) { .output_pins = {PWM_OUTPUT_PIN, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, }, .irq_priority = APP_IRQ_PRIORITY_LOWEST, .base_clock = NRF_PWM_CLK_125kHz, .count_mode = NRF_PWM_MODE_UP, .top_value = ((int) (125000)/frequency_hz), .load_mode = NRF_PWM_LOAD_INDIVIDUAL, .step_mode = NRF_PWM_STEP_AUTO}
 
 static nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
 static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
 static bool is_flexed[NUMBER_OF_SENSORS];
 
+ret_code_t initialize_rtt() {
+    ret_code_t error_code = NRF_LOG_INIT(NULL);
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+    return error_code;
+}
+
 void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
+
+ret_code_t initialize_adc() {
+    nrfx_saadc_config_t saadc_config = NRFX_SAADC_DEFAULT_CONFIG;
+    saadc_config.resolution = NRF_SAADC_RESOLUTION_12BIT;
+    ret_code_t error_code = nrfx_saadc_init(&saadc_config, saadc_callback);
+    return error_code;
+}
+
+ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config) {
+    channel_config.pin_p = pin;
+    ret_code_t error_code = nrfx_saadc_channel_init(channel, &channel_config);
+    return error_code;
+}
 
 // Sample a particular analog channel in blocking mode
 nrf_saadc_value_t sample_value(uint8_t channel) {
@@ -67,25 +87,6 @@ void update_flex_sensor_readings() {
     flex_sensor_readings[2] = sample_value(SENSOR_2_ADC_CHANNEL);
     flex_sensor_readings[3] = sample_value(SENSOR_3_ADC_CHANNEL);
     flex_sensor_readings[4] = sample_value(SENSOR_4_ADC_CHANNEL);
-}
-
-ret_code_t initialize_rtt() {
-    ret_code_t error_code = NRF_LOG_INIT(NULL);
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
-    return error_code;
-}
-
-ret_code_t initialize_adc() {
-    nrfx_saadc_config_t saadc_config = NRFX_SAADC_DEFAULT_CONFIG;
-    saadc_config.resolution = NRF_SAADC_RESOLUTION_12BIT;
-    ret_code_t error_code = nrfx_saadc_init(&saadc_config, saadc_callback);
-    return error_code;
-}
-
-ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config) {
-    channel_config.pin_p = pin;
-    ret_code_t error_code = nrfx_saadc_channel_init(channel, &channel_config);
-    return error_code;
 }
 
 float adc_input_voltage(nrf_saadc_value_t adc_reading) {
@@ -144,53 +145,102 @@ void update_flexed() {
     }
 }
 
-nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0);
-nrf_pwm_values_individual_t pwm_duty_cycle_sequence_values[] = {{25}};
-nrf_pwm_sequence_t const pwm_duty_cycle_sequence =
+static nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0); // The only PWM instance we ever use
+static bool is_pwm_initialized = false;
+
+static nrf_pwm_values_individual_t pwm_duty_cycle_sequence_values[] = {{25}};
+// Changing this number changes the duty cycle.
+// For musical purposes, this just changes the timbre of your note. They all sound pretty bad with square waves.
+// 25 seemed less annoying than some other options.
+
+static nrf_pwm_sequence_t const pwm_duty_cycle_sequence =
 {
     .values.p_individual = pwm_duty_cycle_sequence_values,
     .length              = NRF_PWM_VALUES_LENGTH(pwm_duty_cycle_sequence_values),
     .repeats             = 0,
     .end_delay           = 0
 };
+// This "sequence" stuff is if you're interested in iterating over a range of duty cycles, which we are not.
+// So we can ignore it.
 
-void pwm_init() {
-    nrf_drv_pwm_config_t const pwm_config =
+/* static nrf_drv_pwm_config_t const pwm_config =
+{
+    .output_pins =
     {
-        .output_pins =
-        {
-            OUTPUT_PIN,               // channel 0
-            NRF_DRV_PWM_PIN_NOT_USED, // channel 1
-            NRF_DRV_PWM_PIN_NOT_USED, // channel 2
-            NRF_DRV_PWM_PIN_NOT_USED, // channel 3
-        },
-        .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-        .base_clock   = NRF_PWM_CLK_125kHz,
-        .count_mode   = NRF_PWM_MODE_UP,
-        .top_value    = 478, // ticks per period
-        .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-        .step_mode    = NRF_PWM_STEP_AUTO
-    };
-    // Init PWM without error handler
-    APP_ERROR_CHECK(nrf_drv_pwm_init(&pwm, &pwm_config, NULL));
+        PWM_OUTPUT_PIN,           // channel 0
+        NRF_DRV_PWM_PIN_NOT_USED, // channel 1
+        NRF_DRV_PWM_PIN_NOT_USED, // channel 2
+        NRF_DRV_PWM_PIN_NOT_USED, // channel 3
+    },
+    .irq_priority = APP_IRQ_PRIORITY_LOWEST,
+    .base_clock   = NRF_PWM_CLK_125kHz,
+    .count_mode   = NRF_PWM_MODE_UP,
+    .top_value    = 478, // ticks per period
+    .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
+    .step_mode    = NRF_PWM_STEP_AUTO
+}; */
+
+// Macros that evaluate at compile time to config structs with desired frequencies
+static nrf_drv_pwm_config_t const pwm_config_C4 = PWM_CONFIG(261.6256);
+static nrf_drv_pwm_config_t const pwm_config_D4 = PWM_CONFIG(293.6648);
+static nrf_drv_pwm_config_t const pwm_config_E4 = PWM_CONFIG(329.6276);
+static nrf_drv_pwm_config_t const pwm_config_F4 = PWM_CONFIG(349.2282);
+static nrf_drv_pwm_config_t const pwm_config_G4 = PWM_CONFIG(391.9954);
+static nrf_drv_pwm_config_t const pwm_config_A4 = PWM_CONFIG(440.0000);
+static nrf_drv_pwm_config_t const pwm_config_B4 = PWM_CONFIG(493.8833);
+static nrf_drv_pwm_config_t const pwm_config_C5 = PWM_CONFIG(523.2511);
+
+void pwm_init(const nrf_drv_pwm_config_t* pwm_config_ptr) {
+    // Pass in a pointer to the config struct corresponding to your desired frequency
+    // Init PWM without error handler:
+    APP_ERROR_CHECK(nrf_drv_pwm_init(&pwm, pwm_config_ptr, NULL));
+    is_pwm_initialized = true;
 }
 
-void pwm_start(/*float frequency_hz*/) {
+void pwm_uninit() {
+    nrf_drv_pwm_uninit(&pwm);
+    is_pwm_initialized = false;
+}
+
+void pwm_playback() {
     nrf_drv_pwm_simple_playback(&pwm, &pwm_duty_cycle_sequence, 1, NRF_DRV_PWM_FLAG_LOOP);
 }
 
-int frequency_to_top_value(float frequency_hz) {
-    // Assuming base_clock = NRF_PWM_CLK_125kHz
-    float base_clock_frequency = 250000;
-    float top_value = base_clock_frequency / frequency_hz;
-    return (int) top_value;
+void pwm_start(const nrf_drv_pwm_config_t* pwm_config_ptr) {
+    if (is_pwm_initialized) {
+        pwm_uninit();
+    }
+    pwm_init(pwm_config_ptr); // Re-init PWM with new frequency
+    pwm_playback();
 }
 
-/*
-void pwm_update_duty_cycle(uint8_t duty_cycle) {
-    pwm_duty_cycle_sequence_values->channel_0 = duty_cycle;
-    nrf_drv_pwm_simple_playback(&pwm_0, &pwm_duty_cycle_sequence, 1, NRF_DRV_PWM_FLAG_LOOP);
-}*/
+void play_C_scale(int sustain_length_ms) {
+    pwm_start(&pwm_config_C4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_D4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_E4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_F4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_G4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_A4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_B4);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_start(&pwm_config_C5);
+    nrf_delay_ms(sustain_length_ms);
+
+    pwm_uninit();
+}
 
 int main() {
     //----------Initialization stuff--------------------------------------------------------------------------------
@@ -220,33 +270,17 @@ int main() {
     error_code = initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
     //----------End initialization stuff-----------------------------------------------------------------------------
-
-    /*
-    // initialize GPIO driver
-    if (!nrfx_gpiote_is_init()) {
-        error_code = nrfx_gpiote_init();
-    }
-    APP_ERROR_CHECK(error_code);
-    
-    uint8_t led1 = NRF_GPIO_PIN_MAP(0, 17);
-    uint8_t led2 = NRF_GPIO_PIN_MAP(0, 18);
-
-    nrfx_gpiote_out_config_t out_config = NRFX_GPIOTE_CONFIG_OUT_SIMPLE(true);
-    error_code = nrfx_gpiote_out_init(led1, &out_config);
-    APP_ERROR_CHECK(error_code);
-    error_code = nrfx_gpiote_out_init(led2, &out_config);
-    APP_ERROR_CHECK(error_code);
-    */
     
     // Start clock for accurate frequencies
     NRF_CLOCK->TASKS_HFCLKSTART = 1; 
     // Wait for clock to start
     while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
-    
-    pwm_init();
-    pwm_start();
 
     int i;
+    for (i = 0; i < 10; i++)
+    play_C_scale(500);
+
+    
     nrf_delay_ms(2000);
     printf("RTT working...\n");
 
