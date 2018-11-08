@@ -277,8 +277,9 @@ int main() {
     while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 
     int i;
-    for (i = 0; i < 10; i++)
-    play_C_scale(500);
+    for (i = 0; i < 10; i++) {
+        play_C_scale(500);
+    }
 
     
     nrf_delay_ms(2000);
