@@ -21,6 +21,7 @@
 
 #include "buckler.h"
 // #include "pin_assignments.h"
+#include "pwm_instrument.h"
 
 //define flex sensor readout pins
 #define SENSOR_0_INPUT_PIN NRF_SAADC_INPUT_AIN0
@@ -43,10 +44,21 @@
 
 #define NUMBER_OF_SENSORS 5
 
-#define PWM_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
+/* #define PWM_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17) */
 
-// Don't look at this next line if you value your sanity
+/* // Don't look at this next line if you value your sanity
 #define PWM_CONFIG(frequency_hz) { .output_pins = {PWM_OUTPUT_PIN, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, }, .irq_priority = APP_IRQ_PRIORITY_LOWEST, .base_clock = NRF_PWM_CLK_125kHz, .count_mode = NRF_PWM_MODE_UP, .top_value = ((int) (125000)/frequency_hz), .load_mode = NRF_PWM_LOAD_INDIVIDUAL, .step_mode = NRF_PWM_STEP_AUTO}
+ */
+
+// Macros that evaluate at compile time to config structs with desired frequencies
+/* static nrf_drv_pwm_config_t const pwm_config_C4 = PWM_CONFIG(261.6256);
+static nrf_drv_pwm_config_t const pwm_config_D4 = PWM_CONFIG(293.6648);
+static nrf_drv_pwm_config_t const pwm_config_E4 = PWM_CONFIG(329.6276);
+static nrf_drv_pwm_config_t const pwm_config_F4 = PWM_CONFIG(349.2282);
+static nrf_drv_pwm_config_t const pwm_config_G4 = PWM_CONFIG(391.9954);
+static nrf_drv_pwm_config_t const pwm_config_A4 = PWM_CONFIG(440.0000);
+static nrf_drv_pwm_config_t const pwm_config_B4 = PWM_CONFIG(493.8833);
+static nrf_drv_pwm_config_t const pwm_config_C5 = PWM_CONFIG(523.2511); */
 
 static nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
 static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
@@ -145,7 +157,7 @@ void update_flexed() {
     }
 }
 
-static nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0); // The only PWM instance we ever use
+/* static nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0); // The only PWM instance we ever use
 static bool is_pwm_initialized = false;
 
 static nrf_pwm_values_individual_t pwm_duty_cycle_sequence_values[] = {{25}};
@@ -162,33 +174,6 @@ static nrf_pwm_sequence_t const pwm_duty_cycle_sequence =
 };
 // This "sequence" stuff is if you're interested in iterating over a range of duty cycles, which we are not.
 // So we can ignore it.
-
-/* static nrf_drv_pwm_config_t const pwm_config =
-{
-    .output_pins =
-    {
-        PWM_OUTPUT_PIN,           // channel 0
-        NRF_DRV_PWM_PIN_NOT_USED, // channel 1
-        NRF_DRV_PWM_PIN_NOT_USED, // channel 2
-        NRF_DRV_PWM_PIN_NOT_USED, // channel 3
-    },
-    .irq_priority = APP_IRQ_PRIORITY_LOWEST,
-    .base_clock   = NRF_PWM_CLK_125kHz,
-    .count_mode   = NRF_PWM_MODE_UP,
-    .top_value    = 478, // ticks per period
-    .load_mode    = NRF_PWM_LOAD_INDIVIDUAL,
-    .step_mode    = NRF_PWM_STEP_AUTO
-}; */
-
-// Macros that evaluate at compile time to config structs with desired frequencies
-static nrf_drv_pwm_config_t const pwm_config_C4 = PWM_CONFIG(261.6256);
-static nrf_drv_pwm_config_t const pwm_config_D4 = PWM_CONFIG(293.6648);
-static nrf_drv_pwm_config_t const pwm_config_E4 = PWM_CONFIG(329.6276);
-static nrf_drv_pwm_config_t const pwm_config_F4 = PWM_CONFIG(349.2282);
-static nrf_drv_pwm_config_t const pwm_config_G4 = PWM_CONFIG(391.9954);
-static nrf_drv_pwm_config_t const pwm_config_A4 = PWM_CONFIG(440.0000);
-static nrf_drv_pwm_config_t const pwm_config_B4 = PWM_CONFIG(493.8833);
-static nrf_drv_pwm_config_t const pwm_config_C5 = PWM_CONFIG(523.2511);
 
 void pwm_init(const nrf_drv_pwm_config_t* pwm_config_ptr) {
     // Pass in a pointer to the config struct corresponding to your desired frequency
@@ -212,34 +197,18 @@ void pwm_start(const nrf_drv_pwm_config_t* pwm_config_ptr) {
     }
     pwm_init(pwm_config_ptr); // Re-init PWM with new frequency
     pwm_playback();
-}
+} */
 
 void play_C_scale(int sustain_length_ms) {
-    pwm_start(&pwm_config_C4);
+    start_note(C4);
     nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_D4);
+    stop_note(C4);
+    start_note(D4);
     nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_E4);
+    stop_note(D4);
+    start_note(E4);
     nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_F4);
-    nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_G4);
-    nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_A4);
-    nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_B4);
-    nrf_delay_ms(sustain_length_ms);
-
-    pwm_start(&pwm_config_C5);
-    nrf_delay_ms(sustain_length_ms);
-
-    pwm_uninit();
+    stop_note(E4);
 }
 
 int main() {
@@ -277,8 +246,9 @@ int main() {
     while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 
     int i;
-    for (i = 0; i < 10; i++)
-    play_C_scale(500);
+    for (i = 0; i < 10; i++) {
+        play_C_scale(500);
+    }
 
     
     nrf_delay_ms(2000);
