@@ -14,6 +14,8 @@
 #include "nrfx_gpiote.h"
 #include "nrf_drv_pwm.h"
 
+#define NUMBER_OF_INPUTS 10
+
 typedef enum {
     NOTE_1 = 1,
     NOTE_2,
@@ -26,54 +28,26 @@ typedef enum {
 } note_index_t;
 
 typedef enum {
-    PITCH_BEND_DOWN,
+    PITCH_BEND_DOWN = -1,
+    NO_PITCH_BEND,
     PITCH_BEND_UP
 } pitch_bend_t;
 
-static bool is_input_on[NUMBER_OF_INPUTS];
+static bool is_user_input_present[NUMBER_OF_INPUTS];
+
+// TODO: Refactor into bool is_note_index_input_present[8] and bool is_pitch_bend_input_present[2]
+
+static note_index_t user_input_to_note_index(int user_input) {
+    note_index_t result;
+    if (user_input < 4) {
+        result = (note_index_t) user_input;
+    } else if (user_input > 5) {
+        result = (note_index_t) (user_input - 2);
+    }
+    return result;
+}
 
 typedef enum {
-    // A0,
-    // B0_FLAT,
-    // B0,
-
-    // C1,
-    // D1_FLAT,
-    // D1,
-    // E1_FLAT,
-    // E1,
-    // F1,
-    // G1_FLAT,
-    // G1,
-    // A1_FLAT,
-    // A1,
-    // B1_FLAT,
-    // B1,
-    
-    // C2,
-    // D2_FLAT,
-    // D2,
-    // E2_FLAT,
-    // E2,
-    // F2,
-    // G2_FLAT,
-    // G2,
-    // A2_FLAT,
-    // A2,
-    // B2_FLAT,
-    // B2,
-
-    // C3,
-    // D3_FLAT,
-    // D3,
-    // E3_FLAT,
-    // E3,
-    // F3,
-    // G3_FLAT,
-    // G3,
-    // A3_FLAT,
-    // A3,
-    // B3_FLAT,
     B3,
 
     C4,
@@ -102,35 +76,7 @@ typedef enum {
     B5_FLAT,
     B5,
 
-    C6,
-    // D6_FLAT,
-    // D6,
-    // E6_FLAT,
-    // E6,
-    // F6,
-    // G6_FLAT,
-    // G6,
-    // A6_FLAT,
-    // A6,
-    // B6_FLAT,
-    // B6,
-
-    // C7,
-    // D7_FLAT,
-    // D7,
-    // E7_FLAT,
-    // E7,
-    // F7,
-    // G7_FLAT,
-    // G7,
-    // A7_FLAT,
-    // A7,
-    // B7_FLAT,
-    // B7,
-
-    // C8,
-
-    NUMBER_OF_NOTES
+    C6
 } musical_note_t;
 
 typedef enum {
@@ -145,12 +91,18 @@ typedef enum {
     A_FLAT,
     A,
     B_FLAT,
-    B,
-    NUMBER_OF_KEYS
+    B
 } musical_key_t;
 
-musical_note_t note(note_index_t note_index, musical_key_t key) {
+static musical_key_t key;
+
+static void update_key(int switch_position) {
+    key = (musical_key_t) switch_position;
+}
+
+static musical_note_t index_to_note(note_index_t note_index) {
     musical_note_t tonic;
+    musical_note_t result;
     switch(key) {
         case C:
             tonic = C4;
@@ -191,20 +143,69 @@ musical_note_t note(note_index_t note_index, musical_key_t key) {
     }
     switch(note_index) {
         case NOTE_1:
-            return tonic;
+            result = tonic;
         case NOTE_2:
-            return tonic + 2;
+            result = tonic + 2;
         case NOTE_3:
-            return tonic + 4;
+            result = tonic + 4;
         case NOTE_4:
-            return tonic + 5;
+            result = tonic + 5;
         case NOTE_5:
-            return tonic + 7;
+            result = tonic + 7;
         case NOTE_6:
-            return tonic + 9;
+            result = tonic + 9;
         case NOTE_7:
-            return tonic + 11;
+            result = tonic + 11;
         case NOTE_8:
-            return tonic + 12;
+            result = tonic + 12;
+    }
+    return result;
+}
+
+static musical_note_t pitch_bent_note(musical_note_t note, pitch_bend_t pitch_bend) {
+    return (musical_note_t) (note + pitch_bend);
+}
+
+static musical_note_t output_note(note_index_t note_index, pitch_bend_t pitch_bend) {
+    musical_note_t note = index_to_note(note_index);
+    return pitch_bent_note(note, pitch_bend);
+}
+
+static void update_user_inputs(bool* input) {
+    memcpy(&is_user_input_present, input, sizeof(bool) * NUMBER_OF_INPUTS);
+}
+
+void notes_to_play(musical_note_t* notes) {
+    pitch_bend_t pitch_bend;
+    if ((is_user_input_present[4] && is_user_input_present[5]) || (!is_user_input_present[4] && !is_user_input_present[5])) {
+        pitch_bend = NO_PITCH_BEND;
+    } else if (is_user_input_present[4]) {
+        pitch_bend = PITCH_BEND_DOWN;
+    } else {
+        pitch_bend = PITCH_BEND_UP;
+    }
+
+    note_index_t note_index;
+    musical_note_t note;
+    int i;
+    for (i = 0; i < 4; i++) {
+        if (is_user_input_present[i]) {
+            note_index = user_input_to_note_index(i);
+            note = output_note(note_index, pitch_bend);
+            notes[i] = note;
+        } else {
+            notes[i] = -1;
+        }
+    }
+    for (i = 6; i < 10; i++) {
+        if (is_user_input_present[i]) {
+            note_index = user_input_to_note_index(i);
+            note = output_note(note_index, pitch_bend);
+            notes[i - 2] = note;
+        } else {
+            notes[i - 2] = -1;
+        }
     }
 }
+
+//TODO: Make an "update instrument player state" function that can be called from main.c and updates this file's members.
