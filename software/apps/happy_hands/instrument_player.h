@@ -15,6 +15,7 @@
 #include "nrf_drv_pwm.h"
 
 #define NUMBER_OF_INPUTS 10
+#define NUMBER_OF_NOTES 10
 
 typedef enum {
     NOTE_1 = 1,
@@ -79,17 +80,5 @@ typedef enum {
     B_FLAT,
     B
 } musical_key_t;
-
-static note_index_t user_input_to_note_index(int user_input);
-
-static void update_key(int switch_position);
-
-static musical_note_t index_to_note(note_index_t note_index);
-
-static musical_note_t pitch_bent_note(musical_note_t note, pitch_bend_t pitch_bend);
-
-static musical_note_t output_note(note_index_t note_index, pitch_bend_t pitch_bend);
-
-static void update_user_inputs(bool* input);
 
 void notes_to_play(musical_note_t* notes);
