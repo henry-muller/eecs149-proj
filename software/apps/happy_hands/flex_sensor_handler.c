@@ -35,7 +35,7 @@
 static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
 
 static nrf_saadc_value_t get_sensor_value(int sensor) {
-    nrf_saadc_value_t result;
+    nrf_saadc_value_t result = 0;
     switch(sensor) {
         case 0:
             result = sample_adc_value(SENSOR_0_ADC_CHANNEL);

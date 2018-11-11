@@ -12,12 +12,11 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
-#include "nrfx_saadc.h"
 
-#include "buckler.h"
-#include "adc.h"
+#include "types.h"
 
-#define ROTARY_SWITCH_INPUT_PIN NRF_SAADC_INPUT_AIN0
-#define ROTARY_SWITCH_ADC_CHANNEL 0
+#define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
 
-int get_rotary_switch_position();
+void new_instrument_init();
+
+void new_instrument_play(instrument_state_t* state);
