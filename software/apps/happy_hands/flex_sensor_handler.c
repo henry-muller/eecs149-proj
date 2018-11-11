@@ -38,9 +38,6 @@
 static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
 static bool is_flexed[NUMBER_OF_SENSORS];
 
-
-
-
 static void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
 
 static ret_code_t initialize_adc() {
@@ -74,19 +71,20 @@ void update_flex_sensor_readings() {
 } */
 
 static nrf_saadc_value_t get_sensor_value(int sensor) {
-    nrf_saadc_value_t
+    nrf_saadc_value_t result;
     switch(sensor) {
         case 0:
-            return sample_value(SENSOR_0_ADC_CHANNEL);
+            result = sample_value(SENSOR_0_ADC_CHANNEL);
         case 1:
-            return sample_value(SENSOR_1_ADC_CHANNEL);
+            result = sample_value(SENSOR_1_ADC_CHANNEL);
         case 2:
-            return sample_value(SENSOR_2_ADC_CHANNEL);
+            result = sample_value(SENSOR_2_ADC_CHANNEL);
         case 3:
-            return sample_value(SENSOR_3_ADC_CHANNEL);
+            result = sample_value(SENSOR_3_ADC_CHANNEL);
         case 4:
-            return sample_value(SENSOR_4_ADC_CHANNEL);
+            result = sample_value(SENSOR_4_ADC_CHANNEL);
     }
+    return result;
 }
 
 
@@ -102,9 +100,8 @@ void update_sensor_thresholds() {
     nrf_delay_ms(2000);
     printf("Calibrating...\n");
     for (i = 0; i < count; i++) {
-        update_flex_sensor_readings();
         for (j = 0; j < NUMBER_OF_SENSORS; j++) {
-            sums[j] += get_sensor_value(j);
+            sums[j] += (int32_t) get_sensor_value(j);
             nrf_delay_ms(10);
         }
     }
@@ -127,18 +124,20 @@ static note_index_t user_input_to_note_index(int user_input) {
     return result;
 }
 
+/*
 void update_flex_sensor_handler() {
     int i;
     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
         is_flexed[i] = is_above_threshold(i);
     }
 }
+*/
 
 bool is_sensor_flexed(int i) {
-    return is_flexed[i];
+    return is_above_threshold(get_sensor_value(i));
 }
 
-void initialize_sensors() {
+void initialize_flex_sensors() {
     ret_code_t error_code = NRF_SUCCESS;
     error_code = initialize_adc();
     APP_ERROR_CHECK(error_code);
