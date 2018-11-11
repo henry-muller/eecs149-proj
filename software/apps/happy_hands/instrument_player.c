@@ -34,8 +34,6 @@ typedef enum {
     PITCH_BEND_UP
 } pitch_bend_t;
 
-static bool is_user_input_present[NUMBER_OF_INPUTS];
-
 // static bool is_note_index_input_present[8];
 // static bool is_pitch_bend_input_present[2];
 
@@ -212,6 +210,6 @@ void notes_to_play(musical_note_t* notes) {
     }
 }
 
-void update_instrument_player()
+void play_instrument()
 
 //TODO: Make an "update instrument player state" function that can be called from main.c and updates this file's members.
