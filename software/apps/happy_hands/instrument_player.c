@@ -15,6 +15,7 @@
 #include "nrf_drv_pwm.h"
 
 #define NUMBER_OF_INPUTS 10
+#define NUMBER_OF_NOTES 10
 
 typedef enum {
     NOTE_1 = 1,
@@ -34,6 +35,9 @@ typedef enum {
 } pitch_bend_t;
 
 static bool is_user_input_present[NUMBER_OF_INPUTS];
+
+// static bool is_note_index_input_present[8];
+// static bool is_pitch_bend_input_present[2];
 
 // TODO: Refactor into bool is_note_index_input_present[8] and bool is_pitch_bend_input_present[2]
 
@@ -94,7 +98,7 @@ typedef enum {
     B
 } musical_key_t;
 
-static musical_key_t key;
+// static musical_key_t key;
 
 static void update_key(int switch_position) {
     key = (musical_key_t) switch_position;
@@ -207,5 +211,7 @@ void notes_to_play(musical_note_t* notes) {
         }
     }
 }
+
+void update_instrument_player()
 
 //TODO: Make an "update instrument player state" function that can be called from main.c and updates this file's members.

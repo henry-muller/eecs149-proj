@@ -1,5 +1,3 @@
-// testing flex sensors
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -23,7 +21,7 @@
 // #include "pin_assignments.h"
 #include "pwm_instrument.h"
 
-//define flex sensor readout pins
+/* //define flex sensor readout pins
 #define SENSOR_0_INPUT_PIN NRF_SAADC_INPUT_AIN0
 #define SENSOR_1_INPUT_PIN NRF_SAADC_INPUT_AIN1
 #define SENSOR_2_INPUT_PIN NRF_SAADC_INPUT_AIN2
@@ -34,15 +32,15 @@
 #define SENSOR_1_ADC_CHANNEL 1
 #define SENSOR_2_ADC_CHANNEL 2
 #define SENSOR_3_ADC_CHANNEL 3
-#define SENSOR_4_ADC_CHANNEL 4
+#define SENSOR_4_ADC_CHANNEL 4 */
 
-#define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
+/* #define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
 // ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
-// ADC_OUTPUT = V * 1137.778
+// ADC_OUTPUT = V * 1137.778 */
 #define DIVIDER_RESISTANCE 47000
 // Resistor value used in every resistive divider with the flex sensors
 
-#define NUMBER_OF_SENSORS 5
+// #define NUMBER_OF_SENSORS 5
 
 /* #define PWM_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17) */
 
@@ -60,9 +58,9 @@ static nrf_drv_pwm_config_t const pwm_config_A4 = PWM_CONFIG(440.0000);
 static nrf_drv_pwm_config_t const pwm_config_B4 = PWM_CONFIG(493.8833);
 static nrf_drv_pwm_config_t const pwm_config_C5 = PWM_CONFIG(523.2511); */
 
-static nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
-static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
-static bool is_flexed[NUMBER_OF_SENSORS];
+// static nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
+// static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
+// static bool is_flexed[NUMBER_OF_SENSORS];
 
 ret_code_t initialize_rtt() {
     ret_code_t error_code = NRF_LOG_INIT(NULL);
@@ -70,92 +68,92 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
-void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
+// void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
 
-ret_code_t initialize_adc() {
-    nrfx_saadc_config_t saadc_config = NRFX_SAADC_DEFAULT_CONFIG;
-    saadc_config.resolution = NRF_SAADC_RESOLUTION_12BIT;
-    ret_code_t error_code = nrfx_saadc_init(&saadc_config, saadc_callback);
-    return error_code;
-}
+// ret_code_t initialize_adc() {
+//     nrfx_saadc_config_t saadc_config = NRFX_SAADC_DEFAULT_CONFIG;
+//     saadc_config.resolution = NRF_SAADC_RESOLUTION_12BIT;
+//     ret_code_t error_code = nrfx_saadc_init(&saadc_config, saadc_callback);
+//     return error_code;
+// }
 
-ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config) {
-    channel_config.pin_p = pin;
-    ret_code_t error_code = nrfx_saadc_channel_init(channel, &channel_config);
-    return error_code;
-}
+// ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config) {
+//     channel_config.pin_p = pin;
+//     ret_code_t error_code = nrfx_saadc_channel_init(channel, &channel_config);
+//     return error_code;
+// }
 
-// Sample a particular analog channel in blocking mode
-nrf_saadc_value_t sample_value(uint8_t channel) {
-    nrf_saadc_value_t val;
-    ret_code_t error_code = nrfx_saadc_sample_convert(channel, &val);
-    APP_ERROR_CHECK(error_code);
-    return val;
-}
+// // Sample a particular analog channel in blocking mode
+// nrf_saadc_value_t sample_value(uint8_t channel) {
+//     nrf_saadc_value_t val;
+//     ret_code_t error_code = nrfx_saadc_sample_convert(channel, &val);
+//     APP_ERROR_CHECK(error_code);
+//     return val;
+// }
 
-void update_flex_sensor_readings() {
-    flex_sensor_readings[0] = sample_value(SENSOR_0_ADC_CHANNEL);
-    flex_sensor_readings[1] = sample_value(SENSOR_1_ADC_CHANNEL);
-    flex_sensor_readings[2] = sample_value(SENSOR_2_ADC_CHANNEL);
-    flex_sensor_readings[3] = sample_value(SENSOR_3_ADC_CHANNEL);
-    flex_sensor_readings[4] = sample_value(SENSOR_4_ADC_CHANNEL);
-}
+// void update_flex_sensor_readings() {
+//     flex_sensor_readings[0] = sample_value(SENSOR_0_ADC_CHANNEL);
+//     flex_sensor_readings[1] = sample_value(SENSOR_1_ADC_CHANNEL);
+//     flex_sensor_readings[2] = sample_value(SENSOR_2_ADC_CHANNEL);
+//     flex_sensor_readings[3] = sample_value(SENSOR_3_ADC_CHANNEL);
+//     flex_sensor_readings[4] = sample_value(SENSOR_4_ADC_CHANNEL);
+// }
 
-float adc_input_voltage(nrf_saadc_value_t adc_reading) {
-    return adc_reading / ADC_SCALING_FACTOR;
-}
+// float adc_input_voltage(nrf_saadc_value_t adc_reading) {
+//     return adc_reading / ADC_SCALING_FACTOR;
+// }
 
-float flex_resistance_kohms(float voltage) {
-    // Supply voltage = 5 V. That's where the magic number 5 comes from.
-    return (DIVIDER_RESISTANCE/5 * voltage)/(1 - voltage/5)/1000;
-}
+// float flex_resistance_kohms(float voltage) {
+//     // Supply voltage = 5 V. That's where the magic number 5 comes from.
+//     return (DIVIDER_RESISTANCE/5 * voltage)/(1 - voltage/5)/1000;
+// }
 
-void display_readings() {
-    int i;
-    float voltage;
-    float resistance;
-    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        voltage = adc_input_voltage(flex_sensor_readings[i]);
-        resistance = flex_resistance_kohms(voltage);
-        printf("sample %d: %d | %f V | %f kOhms\n", i, flex_sensor_readings[i], voltage, resistance);
+// void display_readings() {
+//     int i;
+//     float voltage;
+//     float resistance;
+//     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+//         voltage = adc_input_voltage(flex_sensor_readings[i]);
+//         resistance = flex_resistance_kohms(voltage);
+//         printf("sample %d: %d | %f V | %f kOhms\n", i, flex_sensor_readings[i], voltage, resistance);
 
-    }
-}
+//     }
+// }
 
-void update_sensor_thresholds() {
-    int i;
-    int j;
-    int32_t sums[NUMBER_OF_SENSORS];
-    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        sums[i] = 0;
-    }
-    int32_t count = 10; // number of samples to take
-    printf("Preparing to calibrate sensors. Please bend all fingers.\n");
-    nrf_delay_ms(2000);
-    printf("Calibrating...\n");
-    for (i = 0; i < count; i++) {
-        update_flex_sensor_readings();
-        for (j = 0; j < NUMBER_OF_SENSORS; j++) {
-            sums[j] += flex_sensor_readings[j];
-            nrf_delay_ms(10);
-        }
-    }
-    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        flex_sensor_thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
-    }
-}
+// void update_sensor_thresholds() {
+//     int i;
+//     int j;
+//     int32_t sums[NUMBER_OF_SENSORS];
+//     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+//         sums[i] = 0;
+//     }
+//     int32_t count = 10; // number of samples to take
+//     printf("Preparing to calibrate sensors. Please bend all fingers.\n");
+//     nrf_delay_ms(2000);
+//     printf("Calibrating...\n");
+//     for (i = 0; i < count; i++) {
+//         update_flex_sensor_readings();
+//         for (j = 0; j < NUMBER_OF_SENSORS; j++) {
+//             sums[j] += flex_sensor_readings[j];
+//             nrf_delay_ms(10);
+//         }
+//     }
+//     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+//         flex_sensor_thresholds[i] = (nrf_saadc_value_t) (sums[i]/count);
+//     }
+// }
 
-bool is_single_sensor_flexed(int sensor_number) {
-    // Returns true if the ADC reading off the sensor is above 80% of the sensor's calibrated threshold value.
-    return flex_sensor_readings[sensor_number] >= 0.8 * flex_sensor_thresholds[sensor_number];
-}
+// bool is_single_sensor_flexed(int sensor_number) {
+//     // Returns true if the ADC reading off the sensor is above 80% of the sensor's calibrated threshold value.
+//     return flex_sensor_readings[sensor_number] >= 0.8 * flex_sensor_thresholds[sensor_number];
+// }
 
-void update_flexed() {
-    int i;
-    for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        is_flexed[i] = is_single_sensor_flexed(i);
-    }
-}
+// void update_flexed() {
+//     int i;
+//     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+//         is_flexed[i] = is_single_sensor_flexed(i);
+//     }
+// }
 
 /* static nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0); // The only PWM instance we ever use
 static bool is_pwm_initialized = false;
