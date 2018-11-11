@@ -32,11 +32,8 @@
 #define ROTARY_SWITCH_2_FLOOR 9999
 #define ROTARY_SWITCH_1_FLOOR 0
 
-
-static nrf_saadc_value_t rotary_switch_thresholds[12];
-
 int get_rotary_switch_position() {
-    nrf_saadc_value_t adc_value = sample_value(ROTARY_SWITCH_ADC_CHANNEL);
+    nrf_saadc_value_t adc_value = sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL);
     if (adc_value >= ROTARY_SWITCH_12_FLOOR) {
         return 12;
     } else if (adc_value >= ROTARY_SWITCH_11_FLOOR) {

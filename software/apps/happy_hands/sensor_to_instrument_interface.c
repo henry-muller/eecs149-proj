@@ -18,7 +18,7 @@ musical_key_t get_key() {
 }
 
 bool is_note_index_input_present(int note_index) {
-    bool result;
+    bool result = false;
     switch(note_index) {
         case 1:
             result = is_sensor_flexed(NOTE_1_SENSOR);
@@ -43,11 +43,11 @@ bool is_note_index_input_present(int note_index) {
 pitch_bend_t get_pitch_bend() {
     pitch_bend_t result;
     if ((is_sensor_flexed(PITCH_BEND_DOWN_SENSOR) && is_sensor_flexed(PITCH_BEND_UP_SENSOR)) || (!is_sensor_flexed(PITCH_BEND_DOWN_SENSOR) && !is_sensor_flexed(PITCH_BEND_UP_SENSOR))) {
-        pitch_bend = NO_PITCH_BEND;
+        result = NO_PITCH_BEND;
     } else if (is_sensor_flexed(PITCH_BEND_DOWN_SENSOR)) {
-        pitch_bend = PITCH_BEND_DOWN;
+        result = PITCH_BEND_DOWN;
     } else { // is_sensor_flexed(PITCH_BEND_UP_SENSOR)
-        pitch_bend = PITCH_BEND_UP;
+        result = PITCH_BEND_UP;
     }
     return result;
 }
