@@ -14,14 +14,8 @@
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
 
-#include "buckler.h"
+ret_code_t initialize_adc();
 
-#define SENSOR_0_INPUT_PIN NRF_SAADC_INPUT_AIN0
+ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config);
 
-#define SENSOR_0_ADC_CHANNEL 0
-
-#define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
-// ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
-// ADC_OUTPUT = V * 1137.778
-
-int get_rotary_switch_position();
+nrf_saadc_value_t sample_value(uint8_t channel);

@@ -197,17 +197,17 @@ void pwm_start(const nrf_drv_pwm_config_t* pwm_config_ptr) {
     pwm_playback();
 } */
 
-void play_C_scale(int sustain_length_ms) {
-    start_note(C4);
-    nrf_delay_ms(sustain_length_ms);
-    stop_note(C4);
-    start_note(D4);
-    nrf_delay_ms(sustain_length_ms);
-    stop_note(D4);
-    start_note(E4);
-    nrf_delay_ms(sustain_length_ms);
-    stop_note(E4);
-}
+// void play_C_scale(int sustain_length_ms) {
+//     start_note(C4);
+//     nrf_delay_ms(sustain_length_ms);
+//     stop_note(C4);
+//     start_note(D4);
+//     nrf_delay_ms(sustain_length_ms);
+//     stop_note(D4);
+//     start_note(E4);
+//     nrf_delay_ms(sustain_length_ms);
+//     stop_note(E4);
+// }
 
 int main() {
     //----------Initialization stuff--------------------------------------------------------------------------------
@@ -243,10 +243,10 @@ int main() {
     // Wait for clock to start
     while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
 
-    int i;
-    for (i = 0; i < 10; i++) {
-        play_C_scale(500);
-    }
+    // int i;
+    // for (i = 0; i < 10; i++) {
+    //     play_C_scale(500);
+    // }
 
     
     nrf_delay_ms(2000);

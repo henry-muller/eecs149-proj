@@ -24,12 +24,8 @@
 // ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
 // ADC_OUTPUT = V * 1137.778
 
-// static nrf_saadc_value_t flex_sensor_readings[NUMBER_OF_SENSORS];
 static nrf_saadc_value_t rotary_switch_thresholds[12];
 static int switch_position;
-
-
-
 
 static void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
 
@@ -86,4 +82,3 @@ void initialize_sensors() {
     error_code = initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL, channel_config);
     APP_ERROR_CHECK(error_code);
 }
-

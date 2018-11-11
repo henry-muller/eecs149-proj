@@ -1,3 +1,4 @@
+#include "types.h"
 #include "flex_sensor_handler.h"
 #include "rotary_switch_handler.h"
 
@@ -14,7 +15,6 @@
 
 musical_key_t get_key();
 
-bool is_note_index_input_present(note_index_t note_index);
+bool is_note_index_input_present(int note_index);
 
-bool is_pitch_bend_input_present(pitch_bend_t pitch_bend);
-
+pitch_bend_t get_pitch_bend();

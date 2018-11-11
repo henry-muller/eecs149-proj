@@ -1,6 +1,6 @@
+#include "types.h"
 #include "flex_sensor_handler.h"
 #include "rotary_switch_handler.h"
-#include "instrument_player.h"  
 
 #define NOTE_1_SENSOR 0
 #define NOTE_2_SENSOR 1
@@ -17,33 +17,37 @@ musical_key_t get_key() {
     return (musical_key_t) get_rotary_switch_position();
 }
 
-bool is_note_index_input_present(note_index_t note_index) {
+bool is_note_index_input_present(int note_index) {
     bool result;
     switch(note_index) {
-        case NOTE_1:
+        case 1:
             result = is_sensor_flexed(NOTE_1_SENSOR);
-        case NOTE_2:
+        case 2:
             result = is_sensor_flexed(NOTE_2_SENSOR);
-        case NOTE_3:
+        case 3:
             result = is_sensor_flexed(NOTE_3_SENSOR);
-        case NOTE_4:
+        case 4:
             result = is_sensor_flexed(NOTE_4_SENSOR);
-        case NOTE_5:
+        case 5:
             result = is_sensor_flexed(NOTE_5_SENSOR);
-        case NOTE_6:
+        case 6:
             result = is_sensor_flexed(NOTE_6_SENSOR);
+        case 7:
+            result = is_sensor_flexed(NOTE_7_SENSOR);
+        case 8:
+            result = is_sensor_flexed(NOTE_8_SENSOR);
     }
+    return result;
 }
 
-bool is_pitch_bend_input_present(pitch_bend_t pitch_bend) {
-    bool result;
-    switch(pitch_bend) {
-        case PITCH_BEND_DOWN:
-            result = is_sensor_flexed(PITCH_BEND_DOWN_SENSOR);
-        case PITCH_BEND_UP:
-            result = is_sensor_flexed(PITCH_BEND_UP_SENSOR);
-        case NO_PITCH_BEND:
-            result = (!is_sensor_flexed(PITCH_BEND_UP) && !is_sensor_flexed(PITCH_BEND_DOWN)) || (is_sensor_flexed(PITCH_BEND_UP) && is_sensor_flexed(PITCH_BEND_DOWN));
+pitch_bend_t get_pitch_bend() {
+    pitch_bend_t result;
+    if ((is_sensor_flexed(PITCH_BEND_DOWN_SENSOR) && is_sensor_flexed(PITCH_BEND_UP_SENSOR)) || (!is_sensor_flexed(PITCH_BEND_DOWN_SENSOR) && !is_sensor_flexed(PITCH_BEND_UP_SENSOR))) {
+        pitch_bend = NO_PITCH_BEND;
+    } else if (is_sensor_flexed(PITCH_BEND_DOWN_SENSOR)) {
+        pitch_bend = PITCH_BEND_DOWN;
+    } else { // is_sensor_flexed(PITCH_BEND_UP_SENSOR)
+        pitch_bend = PITCH_BEND_UP;
     }
     return result;
 }

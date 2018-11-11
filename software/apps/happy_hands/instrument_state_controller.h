@@ -14,25 +14,22 @@
 #include "nrfx_gpiote.h"
 #include "nrf_drv_pwm.h"
 
-#define NUMBER_OF_INPUTS 10
-#define NUMBER_OF_NOTES 10
+// typedef enum {
+//     NOTE_1 = 1,
+//     NOTE_2,
+//     NOTE_3,
+//     NOTE_4,
+//     NOTE_5,
+//     NOTE_6,
+//     NOTE_7,
+//     NOTE_8
+// } note_index_t;
 
-typedef enum {
-    NOTE_1 = 1,
-    NOTE_2,
-    NOTE_3,
-    NOTE_4,
-    NOTE_5,
-    NOTE_6,
-    NOTE_7,
-    NOTE_8
-} note_index_t;
-
-typedef enum {
-    PITCH_BEND_DOWN = -1,
-    NO_PITCH_BEND,
-    PITCH_BEND_UP
-} pitch_bend_t;
+// typedef enum {
+//     PITCH_BEND_DOWN = -1,
+//     NO_PITCH_BEND,
+//     PITCH_BEND_UP
+// } pitch_bend_t;
 
 typedef enum {
     B3,
@@ -66,19 +63,25 @@ typedef enum {
     C6
 } musical_note_t;
 
-typedef enum {
-    C,
-    D_FLAT,
-    D,
-    E_FLAT,
-    E,
-    F,
-    G_FLAT,
-    G,
-    A_FLAT,
-    A,
-    B_FLAT,
-    B
-} musical_key_t;
+// typedef enum {
+//     C,
+//     D_FLAT,
+//     D,
+//     E_FLAT,
+//     E,
+//     F,
+//     G_FLAT,
+//     G,
+//     A_FLAT,
+//     A,
+//     B_FLAT,
+//     B
+// } musical_key_t;
 
-void notes_to_play(musical_note_t* notes);
+typedef struct {
+    musical_note_t notes_to_play[NUMBER_OF_NOTE_INDICES];
+} instrument_state_t;
+
+void play_instrument(instrument_state_t* state);
+
+
