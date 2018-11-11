@@ -15,13 +15,9 @@
 #include "nrfx_saadc.h"
 
 #include "buckler.h"
+#include "adc.h"
 
-#define SENSOR_0_INPUT_PIN NRF_SAADC_INPUT_AIN0
-
-#define SENSOR_0_ADC_CHANNEL 0
-
-#define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
-// ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
-// ADC_OUTPUT = V * 1137.778
+#define ROTARY_SWITCH_INPUT_PIN NRF_SAADC_INPUT_AIN0
+#define ROTARY_SWITCH_ADC_CHANNEL 0
 
 int get_rotary_switch_position();

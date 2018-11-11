@@ -14,8 +14,10 @@
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
 
-ret_code_t initialize_adc();
+bool is_adc_initialized();
 
-ret_code_t initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel, nrf_saadc_channel_config_t channel_config);
+void initialize_adc();
 
-nrf_saadc_value_t sample_value(uint8_t channel);
+void initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel);
+
+nrf_saadc_value_t sample_adc_value(uint8_t channel);

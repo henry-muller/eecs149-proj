@@ -83,5 +83,3 @@ typedef struct {
 } instrument_state_t;
 
 void play_instrument(instrument_state_t* state);
-
-

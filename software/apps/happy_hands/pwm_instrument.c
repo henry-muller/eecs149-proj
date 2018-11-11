@@ -18,6 +18,7 @@
 
 #define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
 #define PWM_CONFIG(frequency_hz) { .output_pins = {INSTRUMENT_OUTPUT_PIN, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, }, .irq_priority = APP_IRQ_PRIORITY_LOWEST, .base_clock = NRF_PWM_CLK_125kHz, .count_mode = NRF_PWM_MODE_UP, .top_value = ((int) (125000)/frequency_hz), .load_mode = NRF_PWM_LOAD_INDIVIDUAL, .step_mode = NRF_PWM_STEP_AUTO}
+#define NUMBER_OF_NOTES 8
 
 // Macros that evaluate at compile time to config structs with desired frequencies
 static nrf_drv_pwm_config_t const pwm_config_C4 = PWM_CONFIG(261.6256);
@@ -95,7 +96,14 @@ static void stop_note(musical_note_t note) {
     pwm_uninit();
 }
 
-void play(instrument_state_t* state) {
+void pwm_instrument_init() {
+    // Start clock for accurate frequencies
+    NRF_CLOCK->TASKS_HFCLKSTART = 1; 
+    // Wait for clock to start
+    while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
+}
+
+void pwm_instrument_play(instrument_state_t* state) {
     if (state->notes_to_play[0] != -1) {
         start_note(state->notes_to_play[0]);
     } else {

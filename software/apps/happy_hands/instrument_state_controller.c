@@ -68,8 +68,8 @@
 static musical_key_t key;
 
 static musical_note_t index_to_note(int note_index) {
-    musical_note_t tonic;
-    musical_note_t result;
+    musical_note_t tonic = -1;
+    musical_note_t result = -1;
     switch(key) {
         case C:
             tonic = C4;
