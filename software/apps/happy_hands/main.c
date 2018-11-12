@@ -22,7 +22,7 @@
 #include "adc.h"
 #include "flex_sensor_handler.h"
 #include "pwm_instrument.h"
-
+#include "rotary_switch_handler.h"
 
 ret_code_t initialize_rtt() {
     ret_code_t error_code = NRF_LOG_INIT(NULL);
@@ -49,7 +49,7 @@ int main() {
     // it LOOKS like those are already set with the default channel config thing. If that turns out to have
     // been a mistake, will have to rework.
 
-    initialize_flex_sensors();
+    // initialize_flex_sensors();
     //----------End initialization stuff-----------------------------------------------------------------------------
     
     // // Start clock for accurate frequencies
@@ -67,16 +67,23 @@ int main() {
     printf("RTT working...\n");
 
     // Calibrate sensors
-    update_flex_sensor_thresholds();
+    // update_flex_sensor_thresholds();
 
     nrf_delay_ms(5000);
+    initialize_rotary_switch();
 
-    int i;
     while (1) {
-        for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-            printf("%d ", is_sensor_flexed(i));
-        }
-        printf("\n");
-        nrf_delay_ms(1);
+        printf("adc value %d\n", sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL));
+        printf("voltage value %f\n", (sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL))/1137.778);
+        nrf_delay_ms(1000);
     }
+
+    // int i;
+    // while (1) {
+    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+    //         printf("%d ", is_sensor_flexed(i));
+    //     }
+    //     printf("\n");
+    //     nrf_delay_ms(1);
+    // }
 }
