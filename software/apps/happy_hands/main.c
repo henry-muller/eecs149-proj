@@ -87,3 +87,7 @@ int main() {
     //     nrf_delay_ms(1);
     // }
 }
+
+
+//notes
+//vdd = 4.6v
