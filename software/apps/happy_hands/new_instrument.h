@@ -1,3 +1,6 @@
+#ifndef NEW_INSTRUMENT_H
+#define NEW_INSTRUMENT_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -20,3 +23,5 @@
 void new_instrument_init();
 
 void new_instrument_play(instrument_state_t* state);
+
+#endif NEW_INSTRUMENT_H

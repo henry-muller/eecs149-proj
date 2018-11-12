@@ -1,3 +1,6 @@
+#ifndef PWM_INSTRUMENT_H
+#define PWM_INSTRUMENT_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -21,3 +24,5 @@
 
 void pwm_instrument_init();
 void pwm_instrument_play(instrument_state_t* state);
+
+#endif /* PWM_INSTRUMENT_H */

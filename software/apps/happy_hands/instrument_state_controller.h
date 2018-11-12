@@ -1,3 +1,6 @@
+#ifndef INSTRUMENT_STATE_CONTROLLER_H
+#define INSTRUMENT_STATE_CONTROLLER_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -83,3 +86,5 @@ typedef struct {
 } instrument_state_t;
 
 void play_instrument(instrument_state_t* state);
+
+#endif /* INSTRUMENT_STATE_CONTROLLER_H */

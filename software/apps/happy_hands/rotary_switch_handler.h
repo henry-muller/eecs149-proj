@@ -1,3 +1,6 @@
+#ifndef ROTARY_SWITCH_HANDLER_H
+#define ROTARY_SWITCH_HANDLER_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -23,3 +26,5 @@
 int get_rotary_switch_position();
 
 void initialize_rotary_switch();
+
+#endif /* ROTARY_SWITCH_HANDLER_H */

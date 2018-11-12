@@ -1,3 +1,6 @@
+#ifndef SENSOR_TO_INSTRUMENT_INTERFACE_H
+#define SENSOR_TO_INSTRUMENT_INTERFACE_H
+
 #include "types.h"
 #include "flex_sensor_handler.h"
 #include "rotary_switch_handler.h"
@@ -18,3 +21,5 @@ musical_key_t get_key();
 bool is_note_index_input_present(int note_index);
 
 pitch_bend_t get_pitch_bend();
+
+#endif /* SENSOR_TO_INSTRUMENT_INTERFACE_H */

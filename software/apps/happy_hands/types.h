@@ -1,3 +1,6 @@
+#ifndef TYPES_H
+#define TYPES_H
+
 #define NUMBER_OF_NOTE_INDICES 8
 
 typedef enum {
@@ -57,3 +60,5 @@ typedef struct {
     musical_note_t notes_to_play[NUMBER_OF_NOTE_INDICES];
     // Probably will add volume in here too
 } instrument_state_t;
+
+#endif /* TYPES_H */

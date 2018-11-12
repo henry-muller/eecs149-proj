@@ -23,6 +23,7 @@
 #include "flex_sensor_handler.h"
 #include "pwm_instrument.h"
 #include "rotary_switch_handler.h"
+#include "sensor_to_instrument_interface.h"
 
 ret_code_t initialize_rtt() {
     ret_code_t error_code = NRF_LOG_INIT(NULL);
@@ -77,7 +78,7 @@ int main() {
     while (1) {
         //printf("adc value %d\n", sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL));
         //printf("voltage value %f\n", (sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL))/1137.778);
-        printf("%d\n", get_rotary_switch_position());
+        printf("%d | %d\n", get_rotary_switch_position(), get_key());
         nrf_delay_ms(1000);
     }
 

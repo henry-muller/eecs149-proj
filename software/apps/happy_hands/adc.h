@@ -1,3 +1,6 @@
+#ifndef ADC_H
+#define ADC_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -21,3 +24,5 @@ void initialize_adc();
 void initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel);
 
 nrf_saadc_value_t sample_adc_value(uint8_t channel);
+
+#endif /* ADC_H */
