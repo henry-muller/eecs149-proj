@@ -67,7 +67,7 @@ int main() {
     printf("RTT working...\n");
 
     // Calibrate sensors
-    update_flex_sensor_thresholds();
+    //update_flex_sensor_thresholds();
 
     nrf_delay_ms(5000);
 

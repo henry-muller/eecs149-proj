@@ -21,3 +21,5 @@
 #define ROTARY_SWITCH_ADC_CHANNEL 0
 
 int get_rotary_switch_position();
+
+void initialize_rotary_switch();
