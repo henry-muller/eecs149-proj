@@ -17,7 +17,7 @@
 #include "buckler.h"
 #include "adc.h"
 
-#define ROTARY_SWITCH_INPUT_PIN NRF_SAADC_INPUT_AIN0
+#define ROTARY_SWITCH_INPUT_PIN NRF_SAADC_INPUT_AIN2
 #define ROTARY_SWITCH_ADC_CHANNEL 0
 #define ROTARY_SWITCH_12_FLOOR 9999
 #define ROTARY_SWITCH_11_FLOOR 9999
@@ -34,30 +34,30 @@
 
 int get_rotary_switch_position() {
     nrf_saadc_value_t adc_value = sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL);
-    if (adc_value >= ROTARY_SWITCH_12_FLOOR) {
-        return 12;
-    } else if (adc_value >= ROTARY_SWITCH_11_FLOOR) {
-        return 11;
-    } else if (adc_value >= ROTARY_SWITCH_10_FLOOR) {
-        return 10;
-    } else if (adc_value >= ROTARY_SWITCH_9_FLOOR) {
-        return 9;
-    } else if (adc_value >= ROTARY_SWITCH_8_FLOOR) {
-        return 8;
-    } else if (adc_value >= ROTARY_SWITCH_7_FLOOR) {
-        return 7;
-    } else if (adc_value >= ROTARY_SWITCH_6_FLOOR) {
-        return 6;
-    } else if (adc_value >= ROTARY_SWITCH_5_FLOOR) {
-        return 5;
-    } else if (adc_value >= ROTARY_SWITCH_4_FLOOR) {
-        return 4;
-    } else if (adc_value >= ROTARY_SWITCH_3_FLOOR) {
-        return 3;
+    if (adc_value >= ROTARY_SWITCH_1_FLOOR) {
+        return 1;
     } else if (adc_value >= ROTARY_SWITCH_2_FLOOR) {
         return 2;
+    } else if (adc_value >= ROTARY_SWITCH_3_FLOOR) {
+        return 3;
+    } else if (adc_value >= ROTARY_SWITCH_4_FLOOR) {
+        return 4;
+    } else if (adc_value >= ROTARY_SWITCH_5_FLOOR) {
+        return 5;
+    } else if (adc_value >= ROTARY_SWITCH_6_FLOOR) {
+        return 6;
+    } else if (adc_value >= ROTARY_SWITCH_7_FLOOR) {
+        return 7;
+    } else if (adc_value >= ROTARY_SWITCH_8_FLOOR) {
+        return 8;
+    } else if (adc_value >= ROTARY_SWITCH_9_FLOOR) {
+        return 9;
+    } else if (adc_value >= ROTARY_SWITCH_10_FLOOR) {
+        return 10;
+    } else if (adc_value >= ROTARY_SWITCH_11_FLOOR) {
+        return 11;
     } else {
-        return 1;
+        return 12;
     }
 }
 

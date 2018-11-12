@@ -41,9 +41,11 @@ int main() {
     initialize_adc();
 
     // initialize analog inputs
-    // nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
+    //nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
     //channel_config.gain = NRF_SAADC_GAIN1_6; // GAIN = 1.6
     //channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL; // REFERENCE = 0.6
+    //channel_config.pin_p = ROTARY_SWITCH_INPUT_PIN;
+    //error_code = nrfx_saadc_channel_init(ROTARY_SWITCH_ADC_CHANNEL, &channel_config);
 
     // NOTE IN CASE THINGS BREAK WITH THE ADC: I commented out the .gain and .reference things because
     // it LOOKS like those are already set with the default channel config thing. If that turns out to have
@@ -69,7 +71,7 @@ int main() {
     // Calibrate sensors
     // update_flex_sensor_thresholds();
 
-    nrf_delay_ms(5000);
+    //nrf_delay_ms(5000);
     initialize_rotary_switch();
 
     while (1) {
