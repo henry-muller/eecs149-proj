@@ -75,8 +75,9 @@ int main() {
     initialize_rotary_switch();
 
     while (1) {
-        printf("adc value %d\n", sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL));
-        printf("voltage value %f\n", (sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL))/1137.778);
+        //printf("adc value %d\n", sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL));
+        //printf("voltage value %f\n", (sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL))/1137.778);
+        printf("%d\n", get_rotary_switch_position());
         nrf_delay_ms(1000);
     }
 

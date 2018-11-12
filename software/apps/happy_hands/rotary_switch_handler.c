@@ -29,7 +29,7 @@
 #define ROTARY_SWITCH_8_FLOOR 1150
 #define ROTARY_SWITCH_9_FLOOR 859
 #define ROTARY_SWITCH_10_FLOOR 578
-#define ROTARY_SWITCH_11_FLOOR 286
+#define ROTARY_SWITCH_11_FLOOR 186
 #define ROTARY_SWITCH_12_FLOOR -2
 
 int get_rotary_switch_position() {
