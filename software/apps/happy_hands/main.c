@@ -32,7 +32,6 @@ ret_code_t initialize_rtt() {
 }
 
 int main() {
-    //----------Initialization stuff--------------------------------------------------------------------------------
     // initialize RTT library
     ret_code_t error_code = NRF_SUCCESS;
     error_code = initialize_rtt();
@@ -41,57 +40,25 @@ int main() {
     // initialize ADC
     initialize_adc();
 
-    // initialize analog inputs
-    //nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
-    //channel_config.gain = NRF_SAADC_GAIN1_6; // GAIN = 1.6
-    //channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL; // REFERENCE = 0.6
-    //channel_config.pin_p = ROTARY_SWITCH_INPUT_PIN;
-    //error_code = nrfx_saadc_channel_init(ROTARY_SWITCH_ADC_CHANNEL, &channel_config);
-
-    // NOTE IN CASE THINGS BREAK WITH THE ADC: I commented out the .gain and .reference things because
-    // it LOOKS like those are already set with the default channel config thing. If that turns out to have
-    // been a mistake, will have to rework.
-
-    // initialize_flex_sensors();
-    //----------End initialization stuff-----------------------------------------------------------------------------
-    
-    // // Start clock for accurate frequencies
-    // NRF_CLOCK->TASKS_HFCLKSTART = 1; 
-    // // Wait for clock to start
-    // while(NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
-
-    // int i;
-    // for (i = 0; i < 10; i++) {
-    //     play_C_scale(500);
-    // }
-
-    
     nrf_delay_ms(2000);
     printf("RTT working...\n");
 
     // Calibrate sensors
     // update_flex_sensor_thresholds();
 
-    //nrf_delay_ms(5000);
+    int i;
+    while (1) {
+        for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+            printf("%d ", is_sensor_flexed(i));
+        }
+        printf("\n");
+        nrf_delay_ms(1);
+    }
+
     initialize_rotary_switch();
 
     while (1) {
-        //printf("adc value %d\n", sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL));
-        //printf("voltage value %f\n", (sample_adc_value(ROTARY_SWITCH_ADC_CHANNEL))/1137.778);
         printf("%d | %d\n", get_rotary_switch_position(), get_key());
         nrf_delay_ms(1000);
     }
-
-    // int i;
-    // while (1) {
-    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-    //         printf("%d ", is_sensor_flexed(i));
-    //     }
-    //     printf("\n");
-    //     nrf_delay_ms(1);
-    // }
 }
-
-
-//notes
-//vdd = 4.6v
