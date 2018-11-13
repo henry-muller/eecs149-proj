@@ -32,7 +32,9 @@ typedef enum {
     B5_FLAT,
     B5,
 
-    C6
+    C6,
+
+    NO_NOTE
 } musical_note_t;
 
 typedef enum {

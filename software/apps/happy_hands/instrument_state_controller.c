@@ -111,20 +111,28 @@ static musical_note_t index_to_note(int note_index) {
     switch(note_index) {
         case 1:
             result = tonic;
+            break;
         case 2:
             result = tonic + 2;
+            break;
         case 3:
             result = tonic + 4;
+            break;
         case 4:
             result = tonic + 5;
+            break;
         case 5:
             result = tonic + 7;
+            break;
         case 6:
             result = tonic + 9;
+            break;
         case 7:
             result = tonic + 11;
+            break;
         case 8:
             result = tonic + 12;
+            break;
     }
     return result;
 }
@@ -145,7 +153,7 @@ static void update_notes_to_play(instrument_state_t* state) {
         if (is_note_index_input_present(i)) {
             state->notes_to_play[i] = output_note(i, pitch_bend);
         } else {
-            state->notes_to_play[i] = -1;
+            state->notes_to_play[i] = NO_NOTE;
         }
     }
 }

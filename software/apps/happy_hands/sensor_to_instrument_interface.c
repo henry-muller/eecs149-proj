@@ -22,20 +22,28 @@ bool is_note_index_input_present(int note_index) {
     switch(note_index) {
         case 1:
             result = is_sensor_flexed(NOTE_1_SENSOR);
+            break;
         case 2:
             result = is_sensor_flexed(NOTE_2_SENSOR);
+            break;
         case 3:
             result = is_sensor_flexed(NOTE_3_SENSOR);
+            break;
         case 4:
             result = is_sensor_flexed(NOTE_4_SENSOR);
+            break;
         case 5:
             result = is_sensor_flexed(NOTE_5_SENSOR);
+            break;
         case 6:
             result = is_sensor_flexed(NOTE_6_SENSOR);
+            break;
         case 7:
             result = is_sensor_flexed(NOTE_7_SENSOR);
+            break;
         case 8:
             result = is_sensor_flexed(NOTE_8_SENSOR);
+            break;
     }
     return result;
 }

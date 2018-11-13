@@ -42,7 +42,7 @@ static const nrf_drv_pwm_config_t* config_struct_pointers[NUMBER_OF_NOTES] = {
 };
 
 static const nrf_drv_pwm_config_t* get_config_struct_pointer(musical_note_t note) {
-     return config_struct_pointers[note];
+    return config_struct_pointers[note];
 }
 
 static nrf_drv_pwm_t pwm = NRF_DRV_PWM_INSTANCE(0); // The only PWM instance we ever use
@@ -68,6 +68,7 @@ static void pwm_init(const nrf_drv_pwm_config_t* pwm_config_ptr) {
     // Pass in a pointer to the config struct corresponding to your desired frequency
     // Init PWM without error handler:
     APP_ERROR_CHECK(nrf_drv_pwm_init(&pwm, pwm_config_ptr, NULL));
+    //APP_ERROR_CHECK(nrf_drv_pwm_init(&pwm, &pwm_config_C4, NULL));
     is_pwm_initialized = true;
 }
 
@@ -84,7 +85,9 @@ static void pwm_start(const nrf_drv_pwm_config_t* pwm_config_ptr) {
     if (is_pwm_initialized) {
         pwm_uninit();
     }
+    //printf("PWM line 90\n");
     pwm_init(pwm_config_ptr); // Re-init PWM with new frequency
+    //printf("PWM line 92");
     pwm_playback();
 }
 
@@ -93,7 +96,9 @@ static void start_note(musical_note_t note) {
 }
 
 static void stop_note(musical_note_t note) {
-    pwm_uninit();
+    if (is_pwm_initialized) {
+        pwm_uninit();
+    }
 }
 
 void pwm_instrument_init() {
@@ -104,9 +109,16 @@ void pwm_instrument_init() {
 }
 
 void pwm_instrument_play(instrument_state_t* state) {
-    if (state->notes_to_play[0] != -1) {
-        start_note(state->notes_to_play[0]);
-    } else {
-        stop_note(C4);
+    int i = 0;
+    bool still_looking = true;
+    while (i < 5 && still_looking) {
+        if (state->notes_to_play[i]!= NO_NOTE) {
+            printf("i=%d, REQUESTED NOTE %d\n", i, state->notes_to_play[i]);
+            start_note(state->notes_to_play[i]);
+            still_looking = false;
+        } else {
+            stop_note(C4);
+        }
+        i++;
     }
 }

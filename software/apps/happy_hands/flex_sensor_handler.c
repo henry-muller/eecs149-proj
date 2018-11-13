@@ -26,11 +26,11 @@
 #define SENSOR_3_INPUT_PIN NRF_SAADC_INPUT_AIN6
 #define SENSOR_4_INPUT_PIN NRF_SAADC_INPUT_AIN7
 
-#define SENSOR_0_ADC_CHANNEL 0
-#define SENSOR_1_ADC_CHANNEL 1
-#define SENSOR_2_ADC_CHANNEL 2
-#define SENSOR_3_ADC_CHANNEL 3
-#define SENSOR_4_ADC_CHANNEL 4
+#define SENSOR_0_ADC_CHANNEL 1
+#define SENSOR_1_ADC_CHANNEL 2
+#define SENSOR_2_ADC_CHANNEL 3
+#define SENSOR_3_ADC_CHANNEL 4
+#define SENSOR_4_ADC_CHANNEL 5
 
 static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
 
@@ -39,19 +39,26 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
     switch(sensor) {
         case 0:
             result = sample_adc_value(SENSOR_0_ADC_CHANNEL);
+            break;
         case 1:
             result = sample_adc_value(SENSOR_1_ADC_CHANNEL);
+            break;
         case 2:
             result = sample_adc_value(SENSOR_2_ADC_CHANNEL);
+            break;
         case 3:
             result = sample_adc_value(SENSOR_3_ADC_CHANNEL);
+            break;
         case 4:
             result = sample_adc_value(SENSOR_4_ADC_CHANNEL);
+            break;
     }
+    // printf("According to sample_adc_value, sensor %d reading is %d\n", sensor, result);
     return result;
 }
 
 static bool is_above_threshold(int sensor_number, nrf_saadc_value_t sensor_value) {
+    // printf("Threshold for sensor %d is %d\n", sensor_number, flex_sensor_thresholds[sensor_number]);
     return sensor_value >= 0.8 * flex_sensor_thresholds[sensor_number];
 }
 

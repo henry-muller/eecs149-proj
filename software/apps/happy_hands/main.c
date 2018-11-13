@@ -23,6 +23,7 @@
 #include "flex_sensor_handler.h"
 #include "pwm_instrument.h"
 #include "rotary_switch_handler.h"
+#include "instrument_state_controller.h"
 #include "sensor_to_instrument_interface.h"
 
 ret_code_t initialize_rtt() {
@@ -40,25 +41,50 @@ int main() {
     // initialize ADC
     initialize_adc();
 
-    nrf_delay_ms(2000);
+    //nrf_delay_ms(2000);
     printf("RTT working...\n");
-
+    nrf_delay_ms(3000);
     // Calibrate sensors
-    // update_flex_sensor_thresholds();
+    initialize_flex_sensors();
+    update_flex_sensor_thresholds();
+    printf("Line 50\n");
 
-    int i;
-    while (1) {
+    initialize_rotary_switch();
+
+    pwm_instrument_init();
+    printf("Line 53\n");
+
+    instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}};
+
+    printf("Line 57\n");
+
+    while(1) {
+        int i;
         for (i = 0; i < NUMBER_OF_SENSORS; i++) {
             printf("%d ", is_sensor_flexed(i));
         }
         printf("\n");
-        nrf_delay_ms(1);
+        update_instrument_state(&instrument_state);
+        pwm_instrument_play(&instrument_state);
+        nrf_delay_ms(500);
     }
 
-    initialize_rotary_switch();
 
-    while (1) {
-        printf("%d | %d\n", get_rotary_switch_position(), get_key());
-        nrf_delay_ms(1000);
-    }
+    // int i;
+    // while (1) {
+    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+    //         printf("%d ", is_sensor_flexed(i));
+    //         // printf("%d ", sample_adc_value(SENSOR_0_ADC_CHANNEL));
+
+    //     }
+    //     printf("\n");
+    //     nrf_delay_ms(500);
+    // }
+
+    // initialize_rotary_switch();
+
+    // while (1) {
+    //     printf("%d | %d\n", get_rotary_switch_position(), get_key());
+    //     nrf_delay_ms(1000);
+    // }
 }
