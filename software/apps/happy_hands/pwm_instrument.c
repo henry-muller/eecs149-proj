@@ -18,7 +18,7 @@
 
 #define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
 #define PWM_CONFIG(frequency_hz) { .output_pins = {INSTRUMENT_OUTPUT_PIN, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, }, .irq_priority = APP_IRQ_PRIORITY_LOWEST, .base_clock = NRF_PWM_CLK_125kHz, .count_mode = NRF_PWM_MODE_UP, .top_value = ((int) (125000)/frequency_hz), .load_mode = NRF_PWM_LOAD_INDIVIDUAL, .step_mode = NRF_PWM_STEP_AUTO}
-#define NUMBER_OF_NOTES 14
+#define NUMBER_OF_NOTES 26
 
 // Macros that evaluate at compile time to config structs with desired frequencies
 static nrf_drv_pwm_config_t const pwm_config_B3 = PWM_CONFIG(246.9417);
@@ -35,6 +35,18 @@ static nrf_drv_pwm_config_t const pwm_config_A4 = PWM_CONFIG(440.0000);
 static nrf_drv_pwm_config_t const pwm_config_B4_FLAT = PWM_CONFIG(466.1638);
 static nrf_drv_pwm_config_t const pwm_config_B4 = PWM_CONFIG(493.8833);
 static nrf_drv_pwm_config_t const pwm_config_C5 = PWM_CONFIG(523.2511);
+static nrf_drv_pwm_config_t const pwm_config_D5_FLAT = PWM_CONFIG(554.3653);
+static nrf_drv_pwm_config_t const pwm_config_D5 = PWM_CONFIG(587.3295);
+static nrf_drv_pwm_config_t const pwm_config_E5_FLAT = PWM_CONFIG(622.2540);
+static nrf_drv_pwm_config_t const pwm_config_E5 = PWM_CONFIG(659.2251);
+static nrf_drv_pwm_config_t const pwm_config_F5 = PWM_CONFIG(698.4565);
+static nrf_drv_pwm_config_t const pwm_config_G5_FLAT = PWM_CONFIG(739.9888);
+static nrf_drv_pwm_config_t const pwm_config_G5 = PWM_CONFIG(783.9909);
+static nrf_drv_pwm_config_t const pwm_config_A5_FLAT = PWM_CONFIG(830.6094);
+static nrf_drv_pwm_config_t const pwm_config_A5 = PWM_CONFIG(880.0000);
+static nrf_drv_pwm_config_t const pwm_config_B5_FLAT = PWM_CONFIG(932.3275);
+static nrf_drv_pwm_config_t const pwm_config_B5 = PWM_CONFIG(987.7666);
+static nrf_drv_pwm_config_t const pwm_config_C6 = PWM_CONFIG(1046.502);
 
 static const nrf_drv_pwm_config_t* config_struct_pointers[NUMBER_OF_NOTES] = {
     &pwm_config_B3,
@@ -50,7 +62,20 @@ static const nrf_drv_pwm_config_t* config_struct_pointers[NUMBER_OF_NOTES] = {
     &pwm_config_A4,
     &pwm_config_B4_FLAT,
     &pwm_config_B4,
-    &pwm_config_C5
+    &pwm_config_C5,
+    &pwm_config_D5_FLAT,
+    &pwm_config_D5,
+    &pwm_config_E5_FLAT,
+    &pwm_config_E5,
+    &pwm_config_F5,
+    &pwm_config_G5_FLAT,
+    &pwm_config_G5,
+    &pwm_config_A5_FLAT,
+    &pwm_config_A5,
+    &pwm_config_B5_FLAT,
+    &pwm_config_B5,
+    &pwm_config_C6,
+
 };
 
 static const nrf_drv_pwm_config_t* get_config_struct_pointer(musical_note_t note) {
