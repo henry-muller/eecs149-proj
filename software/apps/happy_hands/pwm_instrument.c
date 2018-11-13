@@ -18,25 +18,37 @@
 
 #define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
 #define PWM_CONFIG(frequency_hz) { .output_pins = {INSTRUMENT_OUTPUT_PIN, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, NRF_DRV_PWM_PIN_NOT_USED, }, .irq_priority = APP_IRQ_PRIORITY_LOWEST, .base_clock = NRF_PWM_CLK_125kHz, .count_mode = NRF_PWM_MODE_UP, .top_value = ((int) (125000)/frequency_hz), .load_mode = NRF_PWM_LOAD_INDIVIDUAL, .step_mode = NRF_PWM_STEP_AUTO}
-#define NUMBER_OF_NOTES 8
+#define NUMBER_OF_NOTES 14
 
 // Macros that evaluate at compile time to config structs with desired frequencies
+static nrf_drv_pwm_config_t const pwm_config_B3 = PWM_CONFIG(246.9417);
 static nrf_drv_pwm_config_t const pwm_config_C4 = PWM_CONFIG(261.6256);
+static nrf_drv_pwm_config_t const pwm_config_D4_FLAT = PWM_CONFIG(277.1826);
 static nrf_drv_pwm_config_t const pwm_config_D4 = PWM_CONFIG(293.6648);
+static nrf_drv_pwm_config_t const pwm_config_E4_FLAT = PWM_CONFIG(311.1270);
 static nrf_drv_pwm_config_t const pwm_config_E4 = PWM_CONFIG(329.6276);
 static nrf_drv_pwm_config_t const pwm_config_F4 = PWM_CONFIG(349.2282);
+static nrf_drv_pwm_config_t const pwm_config_G4_FLAT = PWM_CONFIG(369.9944);
 static nrf_drv_pwm_config_t const pwm_config_G4 = PWM_CONFIG(391.9954);
+static nrf_drv_pwm_config_t const pwm_config_A4_FLAT = PWM_CONFIG(415.3047);
 static nrf_drv_pwm_config_t const pwm_config_A4 = PWM_CONFIG(440.0000);
+static nrf_drv_pwm_config_t const pwm_config_B4_FLAT = PWM_CONFIG(466.1638);
 static nrf_drv_pwm_config_t const pwm_config_B4 = PWM_CONFIG(493.8833);
 static nrf_drv_pwm_config_t const pwm_config_C5 = PWM_CONFIG(523.2511);
 
 static const nrf_drv_pwm_config_t* config_struct_pointers[NUMBER_OF_NOTES] = {
+    &pwm_config_B3,
     &pwm_config_C4,
+    &pwm_config_D4_FLAT,
     &pwm_config_D4,
+    &pwm_config_E4_FLAT,
     &pwm_config_E4,
     &pwm_config_F4,
+    &pwm_config_G4_FLAT,
     &pwm_config_G4,
+    &pwm_config_A4_FLAT,
     &pwm_config_A4,
+    &pwm_config_B4_FLAT,
     &pwm_config_B4,
     &pwm_config_C5
 };

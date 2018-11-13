@@ -44,7 +44,7 @@ typedef enum {
 } pitch_bend_t;
 
 typedef enum {
-    C,
+    C = 1,
     D_FLAT,
     D,
     E_FLAT,

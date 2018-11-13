@@ -16,55 +16,6 @@
 
 #include "sensor_to_instrument_interface.h"
 
-// typedef enum {
-//     NOTE_1 = 1,
-//     NOTE_2,
-//     NOTE_3,
-//     NOTE_4,
-//     NOTE_5,
-//     NOTE_6,
-//     NOTE_7,
-//     NOTE_8
-// } note_index_t;
-
-// typedef enum {
-//     PITCH_BEND_DOWN = -1,
-//     NO_PITCH_BEND,
-//     PITCH_BEND_UP
-// } pitch_bend_t;
-
-// static bool is_note_index_input_present[8];
-// static bool is_pitch_bend_input_present[2];
-
-// TODO: Refactor into bool is_note_index_input_present[8] and bool is_pitch_bend_input_present[2]
-
-// static note_index_t user_input_to_note_index(int user_input) {
-//     note_index_t result;
-//     if (user_input < 4) {
-//         result = (note_index_t) user_input;
-//     } else if (user_input > 5) {
-//         result = (note_index_t) (user_input - 2);
-//     }
-//     return result;
-// }
-
-
-
-// typedef enum {
-//     C,
-//     D_FLAT,
-//     D,
-//     E_FLAT,
-//     E,
-//     F,
-//     G_FLAT,
-//     G,
-//     A_FLAT,
-//     A,
-//     B_FLAT,
-//     B
-// } musical_key_t;
-
 static musical_key_t key;
 
 static musical_note_t index_to_note(int note_index) {

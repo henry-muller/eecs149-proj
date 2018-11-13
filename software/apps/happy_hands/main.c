@@ -47,16 +47,12 @@ int main() {
     // Calibrate sensors
     initialize_flex_sensors();
     update_flex_sensor_thresholds();
-    printf("Line 50\n");
 
     initialize_rotary_switch();
 
     pwm_instrument_init();
-    printf("Line 53\n");
 
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}};
-
-    printf("Line 57\n");
 
     while(1) {
         int i;
@@ -64,6 +60,8 @@ int main() {
             printf("%d ", is_sensor_flexed(i));
         }
         printf("\n");
+        printf("key: %d\n", get_key());
+        printf("pitch bend: %d\n", get_pitch_bend());
         update_instrument_state(&instrument_state);
         pwm_instrument_play(&instrument_state);
         nrf_delay_ms(500);
