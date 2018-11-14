@@ -59,7 +59,7 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
 
 static bool is_above_threshold(int sensor_number, nrf_saadc_value_t sensor_value) {
     // printf("Threshold for sensor %d is %d\n", sensor_number, flex_sensor_thresholds[sensor_number]);
-    return sensor_value >= 0.8 * flex_sensor_thresholds[sensor_number];
+    return sensor_value >= 0.9 * flex_sensor_thresholds[sensor_number];
 }
 
 void update_flex_sensor_thresholds() {

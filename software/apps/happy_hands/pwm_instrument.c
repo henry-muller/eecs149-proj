@@ -150,7 +150,7 @@ void pwm_instrument_play(instrument_state_t* state) {
     bool still_looking = true;
     while (i < 5 && still_looking) {
         if (state->notes_to_play[i]!= NO_NOTE) {
-            printf("i=%d, REQUESTED NOTE %d\n", i, state->notes_to_play[i]);
+            //printf("i=%d, REQUESTED NOTE %d\n", i, state->notes_to_play[i]);
             start_note(state->notes_to_play[i]);
             still_looking = false;
         } else {

@@ -60,8 +60,8 @@ int main() {
             printf("%d ", is_sensor_flexed(i));
         }
         printf("\n");
-        printf("key: %d\n", get_key());
-        printf("pitch bend: %d\n", get_pitch_bend());
+        // printf("key: %d\n", get_key());
+        // printf("pitch bend: %d\n", get_pitch_bend());
         update_instrument_state(&instrument_state);
         pwm_instrument_play(&instrument_state);
         nrf_delay_ms(500);
