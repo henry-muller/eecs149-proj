@@ -52,7 +52,7 @@
 #define S01_SEL NRF_GPIO_PIN_MAP(0,6) //pin 8
 #define S23_SEL NRF_GPIO_PIN_MAP(0,7) //pin 9
 #define S67_SEL NRF_GPIO_PIN_MAP(0,8) //pin 10
-#define S89_SEL NRF_GPIO_PIN_MAP(0,9) //pin 11
+#define S89_SEL NRF_GPIO_PIN_MAP(0,11) //pin 11
 
 #define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
 // ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)

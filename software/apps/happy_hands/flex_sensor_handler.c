@@ -121,7 +121,7 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
             break;
         case 9:
             nrf_gpio_pin_clear(S89_SEL);
-            nrf_delay_ms(1);
+            //nrf_delay_ms(1);
             result = sample_adc_value(SENSOR_89_ADC_CHANNEL);
             break;
     }
