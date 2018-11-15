@@ -16,7 +16,7 @@
 
 #include "buckler.h"
 
-// #include "instrument_player.h"
+#include "flex_sensor_handler.h"
 
 /*#define NUMBER_OF_SENSORS 5
 
@@ -58,7 +58,7 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
 }*/
 
 //NEW CODE WITH MUX
-#define NUMBER_OF_SENSORS 10
+/*#define NUMBER_OF_SENSORS 10
 
 #define SENSOR_01_INPUT_PIN NRF_SAADC_INPUT_AIN2 //left pink and ring
 #define SENSOR_23_INPUT_PIN NRF_SAADC_INPUT_AIN3 //left middle and pointer
@@ -72,17 +72,12 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
 #define SENSOR_4_ADC_CHANNEL 1 //left thumb
 #define SENSOR_5_ADC_CHANNEL 6 //right thumb
 #define SENSOR_67_ADC_CHANNEL 4 // right pointer and middle
-#define SENSOR_89_ADC_CHANNEL 5 // right ring and pinky
+#define SENSOR_89_ADC_CHANNEL 5 // right ring and pinky*/
 
-#define S01_SEL NRF_GPIO_PIN_MAP(0,6) //pin 8
-#define S23_SEL NRF_GPIO_PIN_MAP(0,7) //pin 9
-#define S67_SEL NRF_GPIO_PIN_MAP(0,8) //pin 10
-#define S89_SEL NRF_GPIO_PIN_MAP(0,9) //pin 11
-
-nrf_gpio_cfg_output(S01_SEL);
-nrf_gpio_cfg_output(S23_SEL);
-nrf_gpio_cfg_output(S67_SEL);
-nrf_gpio_cfg_output(S89_SEL);
+/*#define S01_SEL NRF_GPIO_PIN_MAP(0, 6) //pin 8
+#define S23_SEL NRF_GPIO_PIN_MAP(0, 7) //pin 9
+#define S67_SEL NRF_GPIO_PIN_MAP(0, 8) //pin 10
+#define S89_SEL NRF_GPIO_PIN_MAP(0, 9) //pin 11*/
 
 
 static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
@@ -126,6 +121,7 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
             break;
         case 9:
             nrf_gpio_pin_clear(S89_SEL);
+            nrf_delay_ms(1);
             result = sample_adc_value(SENSOR_89_ADC_CHANNEL);
             break;
     }
@@ -164,6 +160,11 @@ void initialize_flex_sensors() {
     if (!is_adc_initialized()) {
         initialize_adc();
     }
+    nrf_gpio_cfg_output(S01_SEL);
+    nrf_gpio_cfg_output(S23_SEL);
+    nrf_gpio_cfg_output(S67_SEL);
+    nrf_gpio_cfg_output(S89_SEL);
+
     /*initialize_adc_channel(SENSOR_0_INPUT_PIN, SENSOR_0_ADC_CHANNEL);
     initialize_adc_channel(SENSOR_1_INPUT_PIN, SENSOR_1_ADC_CHANNEL);
     initialize_adc_channel(SENSOR_2_INPUT_PIN, SENSOR_2_ADC_CHANNEL);
