@@ -18,7 +18,7 @@
 
 // #include "instrument_player.h"
 
-#define NUMBER_OF_SENSORS 5
+/*#define NUMBER_OF_SENSORS 5
 
 #define SENSOR_0_INPUT_PIN NRF_SAADC_INPUT_AIN3
 #define SENSOR_1_INPUT_PIN NRF_SAADC_INPUT_AIN4
@@ -51,6 +51,82 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
             break;
         case 4:
             result = sample_adc_value(SENSOR_4_ADC_CHANNEL);
+            break;
+    }
+    // printf("According to sample_adc_value, sensor %d reading is %d\n", sensor, result);
+    return result;
+}*/
+
+//NEW CODE WITH MUX
+#define NUMBER_OF_SENSORS 10
+
+#define SENSOR_01_INPUT_PIN NRF_SAADC_INPUT_AIN2 //left pink and ring
+#define SENSOR_23_INPUT_PIN NRF_SAADC_INPUT_AIN3 //left middle and pointer
+#define SENSOR_4_INPUT_PIN NRF_SAADC_INPUT_AIN1 //left thumb
+#define SENSOR_5_INPUT_PIN NRF_SAADC_INPUT_AIN6 //right thumb
+#define SENSOR_67_INPUT_PIN NRF_SAADC_INPUT_AIN4 // right pointer and middle
+#define SENSOR_89_INPUT_PIN NRF_SAADC_INPUT_AIN5 // right ring and pinky
+
+#define SENSOR_01_ADC_CHANNEL 2 //left pink and ring
+#define SENSOR_23_ADC_CHANNEL 3 //left middle and pointer
+#define SENSOR_4_ADC_CHANNEL 1 //left thumb
+#define SENSOR_5_ADC_CHANNEL 6 //right thumb
+#define SENSOR_67_ADC_CHANNEL 4 // right pointer and middle
+#define SENSOR_89_ADC_CHANNEL 5 // right ring and pinky
+
+#define S01_SEL NRF_GPIO_PIN_MAP(0,6) //pin 8
+#define S23_SEL NRF_GPIO_PIN_MAP(0,7) //pin 9
+#define S67_SEL NRF_GPIO_PIN_MAP(0,8) //pin 10
+#define S89_SEL NRF_GPIO_PIN_MAP(0,9) //pin 11
+
+nrf_gpio_cfg_output(S01_SEL);
+nrf_gpio_cfg_output(S23_SEL);
+nrf_gpio_cfg_output(S67_SEL);
+nrf_gpio_cfg_output(S89_SEL);
+
+
+static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
+
+static nrf_saadc_value_t get_sensor_value(int sensor) {
+    nrf_saadc_value_t result = 0;
+    switch(sensor) {
+        case 0:
+            nrf_gpio_pin_set(S01_SEL);
+            result = sample_adc_value(SENSOR_01_ADC_CHANNEL);
+            break;
+        case 1:
+            nrf_gpio_pin_clear(S01_SEL);
+            result = sample_adc_value(SENSOR_01_ADC_CHANNEL);
+            break;
+        case 2:
+            nrf_gpio_pin_set(S23_SEL);
+            result = sample_adc_value(SENSOR_23_ADC_CHANNEL);
+            break;
+        case 3:
+            nrf_gpio_pin_clear(S23_SEL);
+            result = sample_adc_value(SENSOR_23_ADC_CHANNEL);
+            break;
+        case 4:
+            result = sample_adc_value(SENSOR_4_ADC_CHANNEL);
+            break;
+        case 5:
+            result = sample_adc_value(SENSOR_5_ADC_CHANNEL);
+            break;
+        case 6:
+            nrf_gpio_pin_set(S67_SEL);
+            result = sample_adc_value(SENSOR_67_ADC_CHANNEL);
+            break;
+        case 7:
+            nrf_gpio_pin_clear(S67_SEL);
+            result = sample_adc_value(SENSOR_67_ADC_CHANNEL);
+            break;
+        case 8:
+            nrf_gpio_pin_set(S89_SEL);
+            result = sample_adc_value(SENSOR_89_ADC_CHANNEL);
+            break;
+        case 9:
+            nrf_gpio_pin_clear(S89_SEL);
+            result = sample_adc_value(SENSOR_89_ADC_CHANNEL);
             break;
     }
     // printf("According to sample_adc_value, sensor %d reading is %d\n", sensor, result);
@@ -88,11 +164,17 @@ void initialize_flex_sensors() {
     if (!is_adc_initialized()) {
         initialize_adc();
     }
-    initialize_adc_channel(SENSOR_0_INPUT_PIN, SENSOR_0_ADC_CHANNEL);
+    /*initialize_adc_channel(SENSOR_0_INPUT_PIN, SENSOR_0_ADC_CHANNEL);
     initialize_adc_channel(SENSOR_1_INPUT_PIN, SENSOR_1_ADC_CHANNEL);
     initialize_adc_channel(SENSOR_2_INPUT_PIN, SENSOR_2_ADC_CHANNEL);
     initialize_adc_channel(SENSOR_3_INPUT_PIN, SENSOR_3_ADC_CHANNEL);
+    initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL);*/
+    initialize_adc_channel(SENSOR_01_INPUT_PIN, SENSOR_01_ADC_CHANNEL);
+    initialize_adc_channel(SENSOR_23_INPUT_PIN, SENSOR_23_ADC_CHANNEL);
     initialize_adc_channel(SENSOR_4_INPUT_PIN, SENSOR_4_ADC_CHANNEL);
+    initialize_adc_channel(SENSOR_5_INPUT_PIN, SENSOR_5_ADC_CHANNEL);
+    initialize_adc_channel(SENSOR_67_INPUT_PIN, SENSOR_67_ADC_CHANNEL);
+    initialize_adc_channel(SENSOR_89_INPUT_PIN, SENSOR_89_ADC_CHANNEL);
 }
 
 bool is_sensor_flexed(int sensor_number) {
