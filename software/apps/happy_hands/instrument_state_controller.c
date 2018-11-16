@@ -101,8 +101,8 @@ static void update_notes_to_play(instrument_state_t* state) {
     pitch_bend_t pitch_bend = get_pitch_bend();
     int i;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
-        if (is_note_index_input_present(i)) {
-            state->notes_to_play[i] = output_note(i, pitch_bend);
+        if (is_note_index_input_present(i + 1)) {
+            state->notes_to_play[i] = output_note(i + 1, pitch_bend);
         } else {
             state->notes_to_play[i] = NO_NOTE;
         }
