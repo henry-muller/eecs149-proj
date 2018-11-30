@@ -32,7 +32,7 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
-int main() {
+int _main() { // Note that I renamed this to _main so that it wouldn't conflict with the main in main_i2s.c
     // initialize RTT library
     ret_code_t error_code = NRF_SUCCESS;
     error_code = initialize_rtt();
