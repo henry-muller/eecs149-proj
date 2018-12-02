@@ -25,7 +25,7 @@
 
 nrf_saadc_value_t get_accelerometer_adc();
 
-volume_command_t adc_value_to_volume_command(nrf_saadc_value_t adc_value);
+// volume_command_t get_volume_command();
 
 void initialize_accelerometer();
 

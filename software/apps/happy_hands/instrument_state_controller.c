@@ -16,6 +16,9 @@
 
 #include "sensor_to_instrument_interface.h"
 
+#define MIN_VOLUME 0
+#define MAX_VOLUME 5
+
 static musical_key_t key;
 
 static musical_note_t index_to_note(int note_index) {
@@ -109,6 +112,15 @@ static void update_notes_to_play(instrument_state_t* state) {
     }
 }
 
+static void update_volume_level(instrument_state_t* state) {
+    volume_command_t volume_command = get_volume_command();
+    switch(volume_command) 
+    // TODO: Switch on volume_command, which is DOWN, HOLD, or UP.
+    // Update state->volume_level accordingly.
+    // Use the constants MIN_VOLUME and MAX_VOLUME to avoid overrun
+    
+}
+
 static void update_key() {
     key = get_key();
 }
@@ -116,7 +128,7 @@ static void update_key() {
 void update_instrument_state(instrument_state_t* state) {
     update_key();
     update_notes_to_play(state);
-    // guess we update volume here too?
+    update_volume_level(state);
 }
 
 // Rule: all instrument files have a "play" function that takes in an instrument_state_t struct.

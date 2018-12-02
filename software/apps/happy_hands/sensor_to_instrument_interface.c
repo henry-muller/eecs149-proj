@@ -61,6 +61,15 @@ pitch_bend_t get_pitch_bend() {
     return result;
 }
 
-volume_level_t get_volume_level() {
-    volume_command_t volume_command = adc_value_to_volume_command(get_)
+volume_command_t get_volume_command() {
+    int hold_floor = 1400;
+    int hold_ceiling = 1800;
+    nrf_saadc_value_t val = get_accelerometer_adc();
+    if (val < hold_floor) {
+        return DOWN;
+    } else if (val > hold_floor && val < hold_ceiling) {
+        return HOLD;
+    } else {
+        return UP;
+    }
 }

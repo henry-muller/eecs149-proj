@@ -22,4 +22,6 @@ bool is_note_index_input_present(int note_index);
 
 pitch_bend_t get_pitch_bend();
 
+volume_command_t get_volume_command();
+
 #endif /* SENSOR_TO_INSTRUMENT_INTERFACE_H */

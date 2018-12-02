@@ -66,8 +66,7 @@ typedef enum {
 
 typedef struct {
     musical_note_t notes_to_play[NUMBER_OF_NOTE_INDICES];
-    int volume;
-    // Probably will add volume in here too
+    int volume_level;
 } instrument_state_t;
 
 #endif /* TYPES_H */
