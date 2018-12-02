@@ -21,9 +21,11 @@
 #include "adc.h"
 
 #define ACCELEROMETER_INPUT_PIN NRF_SAADC_INPUT_AIN7
-#define ROTARY_SWITCH_ADC_CHANNEL 7
+#define ACCELEROMETER_ADC_CHANNEL 7
 
 int get_adc();
+
+volume_command_t adc_value_to_volume_command(nrf_saadc_value_t adc_value);
 
 void initialize_accelerometer();
 

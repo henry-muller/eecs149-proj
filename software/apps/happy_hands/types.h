@@ -58,8 +58,15 @@ typedef enum {
     B
 } musical_key_t;
 
+typedef enum {
+    DOWN,
+    HOLD,
+    UP
+} volume_command_t;
+
 typedef struct {
     musical_note_t notes_to_play[NUMBER_OF_NOTE_INDICES];
+    int volume;
     // Probably will add volume in here too
 } instrument_state_t;
 

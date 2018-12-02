@@ -1,6 +1,7 @@
 #include "types.h"
 #include "flex_sensor_handler.h"
 #include "rotary_switch_handler.h"
+#include "accelerometer_handler.h"
 
 #define NOTE_1_SENSOR 0
 #define NOTE_2_SENSOR 1
@@ -58,4 +59,8 @@ pitch_bend_t get_pitch_bend() {
         result = PITCH_BEND_UP;
     }
     return result;
+}
+
+volume_level_t get_volume_level() {
+    volume_command_t volume_command = adc_value_to_volume_command(get_)
 }

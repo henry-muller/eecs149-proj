@@ -15,7 +15,12 @@
 
 #include "types.h"
 
-#define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
+#include <nrf.h>
+
+#define PIN_MCK    (13)
+#define PIN_SCK    (14) // same as BCK
+#define PIN_LRCK   (15)
+#define PIN_SDOUT  (16) // same as DIN
 
 void new_instrument_init() {
     return;
