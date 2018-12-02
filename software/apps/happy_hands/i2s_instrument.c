@@ -91,22 +91,22 @@ void i2s_instrument_init() {
 }
 
 static void play_wave(int16_t wave_table[], size_t wave_table_size) {
-    printf("got to line 62\n");
     // Configure data pointer
     NRF_I2S->TXD.PTR = (uint32_t)wave_table;
-    NRF_I2S->RXTXD.MAXCNT = wave_table_size/2;
+    NRF_I2S->RXTXD.MAXCNT = CHORD_ARRAY_LENGTH/2; // Figure out why you have to divide by 2.
+    // Can this be fixed by the settings we initialize I2S with? Maybe mono vs. stereo or something?
+    // The code I copied this from used stereo, that might explain the differences
 
     // Start transmitting I2S data
     NRF_I2S->TASKS_START = 1;
-    printf("Finished\n");
 }
 
 static int16_t[] generate_chord(musical_note_t notes_to_play[]) {
-    int16_t* chord = malloc(CHORD_ARRAY_LENGTH * sizeof(int16_t));
+    int16_t* chord_array = calloc(CHORD_ARRAY_LENGTH, sizeof(int16_t));
     int i;
+    int j;
     int16_t* current_note_array;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
-        chord[i] = 0;
         switch(notes_to_play[i]) {
             case B3:
                 current_note_array = B3_array;
@@ -186,8 +186,12 @@ static int16_t[] generate_chord(musical_note_t notes_to_play[]) {
             case C6:
                 current_note_array = C6_array;
                 break;
-        } 
+        }
+        for (j = 0; j < CHORD_ARRAY_LENGTH; j++) {
+            chord_array[j] +=  current_note_array[j]; // Assumes everything starts at 0
+        }
     }
+    return chord_array;
 }
 
 void i2s_instrument_play(instrument_state_t* state) {
