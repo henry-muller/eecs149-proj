@@ -21,7 +21,7 @@
 // #include "pin_assignments.h"
 #include "adc.h"
 #include "flex_sensor_handler.h"
-#include "pwm_instrument.h"
+#include "i2s_instrument.h"
 #include "rotary_switch_handler.h"
 #include "instrument_state_controller.h"
 #include "sensor_to_instrument_interface.h"
@@ -32,7 +32,7 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
-int _main() { // Note that I renamed this to _main so that it wouldn't conflict with the main in main_i2s.c
+int main(void) { // Note that I renamed this to _main so that it wouldn't conflict with the main in main_i2s.c
     // initialize RTT library
     ret_code_t error_code = NRF_SUCCESS;
     error_code = initialize_rtt();
@@ -45,44 +45,24 @@ int _main() { // Note that I renamed this to _main so that it wouldn't conflict 
     printf("RTT working...\n");
     nrf_delay_ms(3000);
     // Calibrate sensors
-    initialize_flex_sensors();
-    update_flex_sensor_thresholds();
+    //initialize_flex_sensors();
+    //update_flex_sensor_thresholds();
 
-    initialize_rotary_switch();
+    //initialize_rotary_switch();
 
-    pwm_instrument_init();
-
-    instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}};
-
+    instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    i2s_instrument_init();
+    i2s_instrument_play(&instrument_state);
     while(1) {
+        __WFE();
+        /*
         int i;
         for (i = 0; i < NUMBER_OF_SENSORS; i++) {
             printf("%d ", is_sensor_flexed(i));
         }
         printf("\n");
-        // printf("key: %d\n", get_key());
-        // printf("pitch bend: %d\n", get_pitch_bend());
-        update_instrument_state(&instrument_state);
-        pwm_instrument_play(&instrument_state);
-        nrf_delay_ms(500);
+        */
+        //update_instrument_state(&instrument_state);
+        //i2s_instrument_play(&instrument_state);
     }
-
-
-    // int i;
-    // while (1) {
-    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-    //         printf("%d ", is_sensor_flexed(i));
-    //         // printf("%d ", sample_adc_value(SENSOR_0_ADC_CHANNEL));
-
-    //     }
-    //     printf("\n");
-    //     nrf_delay_ms(500);
-    // }
-
-    // initialize_rotary_switch();
-
-    // while (1) {
-    //     printf("%d | %d\n", get_rotary_switch_position(), get_key());
-    //     nrf_delay_ms(1000);
-    // }
 }

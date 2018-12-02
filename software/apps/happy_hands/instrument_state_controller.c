@@ -114,11 +114,20 @@ static void update_notes_to_play(instrument_state_t* state) {
 
 static void update_volume_level(instrument_state_t* state) {
     volume_command_t volume_command = get_volume_command();
-    switch(volume_command) 
-    // TODO: Switch on volume_command, which is DOWN, HOLD, or UP.
-    // Update state->volume_level accordingly.
-    // Use the constants MIN_VOLUME and MAX_VOLUME to avoid overrun
-    
+    switch(volume_command) {
+        case DOWN:
+            if (state->volume_level > MIN_VOLUME) {
+                state->volume_level--;
+            }
+            break;
+        case HOLD:
+            break;
+        case UP:
+            if (state->volume_level < MAX_VOLUME) {
+                state->volume_level++;
+            }
+            break;
+    }
 }
 
 static void update_key() {
