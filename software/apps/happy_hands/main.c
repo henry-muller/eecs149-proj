@@ -13,14 +13,10 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
-//#include "nrf_drv_pwm.h"
-//#include "nrf_drv_clock.h"
-//#include "nrfx_pwm.h"
 #include "nrf_i2s.h"
 #include "nrfx_i2s.h"
 
 #include "buckler.h"
-// #include "pin_assignments.h"
 #include "adc.h"
 #include "flex_sensor_handler.h"
 #include "i2s_instrument.h"
@@ -50,8 +46,9 @@ int main(void) {
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
     instrument_state.notes_to_play[0] = C4;
+    //instrument_state.notes_to_play[1] = B3;
     while(1) {
-        printf("In while loop\n");
+        //printf("In while loop\n");
         i2s_instrument_play(&instrument_state);
     }
 
