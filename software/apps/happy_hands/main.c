@@ -13,7 +13,7 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
-#include "nrf_drv_pwm.h"
+//#include "nrf_drv_pwm.h"
 //#include "nrf_drv_clock.h"
 //#include "nrfx_pwm.h"
 
@@ -45,11 +45,30 @@ int main(void) { // Note that I renamed this to _main so that it wouldn't confli
     printf("RTT working...\n");
     nrf_delay_ms(3000);
     // Calibrate sensors
-    //initialize_flex_sensors();
-    //update_flex_sensor_thresholds();
+    initialize_flex_sensors();
+    update_flex_sensor_thresholds();
+    /*
+    int i;
+    while(1) {
+        for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+            printf("%d ", is_sensor_flexed(i));
+        }
+        printf("\n");
+    } */
+
+    nrf_gpio_pin_set(S01_SEL);
+    //nrf_gpio_pin_clear(S01_SEL);
+    //nrf_gpio_pin_set(S23_SEL);
+    //nrf_gpio_pin_clear(S23_SEL);
+    //nrf_gpio_pin_set(S67_SEL);
+    //nrf_gpio_pin_clear(S67_SEL);
+    //nrf_gpio_pin_set(S89_SEL);
+    //nrf_gpio_pin_clear(S89_SEL);
+
 
     //initialize_rotary_switch();
 
+    /*
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
     i2s_instrument_play(&instrument_state);
@@ -64,5 +83,4 @@ int main(void) { // Note that I renamed this to _main so that it wouldn't confli
         */
         //update_instrument_state(&instrument_state);
         //i2s_instrument_play(&instrument_state);
-    }
 }
