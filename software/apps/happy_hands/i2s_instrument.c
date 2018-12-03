@@ -83,6 +83,13 @@ void i2s_instrument_init() {
     NRF_I2S->PSEL.SDOUT = (PIN_SDOUT << I2S_PSEL_SDOUT_PIN_Pos);
 
     NRF_I2S->ENABLE = 1;
+
+    // Configure data pointer
+    NRF_I2S->TXD.PTR = (uint32_t)NO_NOTE_array;
+    NRF_I2S->RXTXD.MAXCNT = 1;
+
+    // Start transmitting I2S data
+    NRF_I2S->TASKS_START = 1;
 }
 
 static void play_wave(int16_t wave_array[], size_t array_size) {
@@ -93,7 +100,7 @@ static void play_wave(int16_t wave_array[], size_t array_size) {
     // The code I copied this from used stereo, that might explain the differences
 
     // Start transmitting I2S data
-    NRF_I2S->TASKS_START = 1;
+    //NRF_I2S->TASKS_START = 1;
 }
 
 static int16_t* generate_chord(musical_note_t notes_to_play[]) {
@@ -208,5 +215,55 @@ void i2s_instrument_play(instrument_state_t* state) {
         nrf_delay_ms(2000);
         play_wave(D4_FLAT_array, ARRAY_SIZE(D4_FLAT_array));
         nrf_delay_ms(2000);
+        /*
+        play_wave(D4_array, ARRAY_SIZE(D4_array));
+        nrf_delay_ms(2000);
+        play_wave(E4_FLAT_array, ARRAY_SIZE(E4_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(E4_array, ARRAY_SIZE(E4_array));
+        nrf_delay_ms(2000);
+        
+        play_wave(F4_array, ARRAY_SIZE(F4_array));
+        nrf_delay_ms(2000);
+        play_wave(G4_FLAT_array, ARRAY_SIZE(G4_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(G4_array, ARRAY_SIZE(G4_array));
+        nrf_delay_ms(2000);
+        play_wave(A4_FLAT_array, ARRAY_SIZE(A4_FLAT_array));
+        nrf_delay_ms(2000);
+        /*
+        play_wave(A4_array, ARRAY_SIZE(A4_array));
+        nrf_delay_ms(2000);
+        play_wave(B4_FLAT_array, ARRAY_SIZE(B4_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(B4_array, ARRAY_SIZE(B4_array));
+        nrf_delay_ms(2000);
+        play_wave(C5_array, ARRAY_SIZE(C5_array));
+        nrf_delay_ms(2000);
+        play_wave(D5_FLAT_array, ARRAY_SIZE(D5_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(D5_array, ARRAY_SIZE(D5_array));
+        nrf_delay_ms(2000);
+        play_wave(E5_FLAT_array, ARRAY_SIZE(E5_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(E5_array, ARRAY_SIZE(E5_array));
+        nrf_delay_ms(2000);
+        play_wave(F5_array, ARRAY_SIZE(F5_array));
+        nrf_delay_ms(2000);
+        play_wave(G5_FLAT_array, ARRAY_SIZE(G5_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(G5_array, ARRAY_SIZE(G5_array));
+        nrf_delay_ms(2000);
+        play_wave(A5_FLAT_array, ARRAY_SIZE(A5_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(A5_array, ARRAY_SIZE(A5_array));
+        nrf_delay_ms(2000);
+        play_wave(B5_FLAT_array, ARRAY_SIZE(B5_FLAT_array));
+        nrf_delay_ms(2000);
+        play_wave(B5_array, ARRAY_SIZE(B5_array));
+        nrf_delay_ms(2000);
+        play_wave(C6_array, ARRAY_SIZE(C6_array));
+        nrf_delay_ms(2000);
+        */
    }
 }
