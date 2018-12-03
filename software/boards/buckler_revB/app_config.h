@@ -119,3 +119,6 @@
 
 #define NRFX_PPI_ENABLED 1
 #define PPI_ENABLED 1
+
+#define I2S_ENABLED 1
+#define NRFX_I2S_ENABLED 1

@@ -16,9 +16,10 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 
-#include "types.h"
+#include "nrf_i2s.h"
+#include "nrfx_i2s.h"
 
-#define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
+#include "types.h"
 
 void i2s_instrument_init();
 

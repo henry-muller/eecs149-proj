@@ -83,6 +83,7 @@ BOARD_SOURCES += \
 	nrfx_ppi.c\
 	nrf_drv_ppi.c\
 	nrfx_pwm.c\
+	nrfx_i2s.c\
 
 ifneq ($(SOFTDEVICE_MODEL),blank)
 BOARD_SOURCES += nrf_sdh.c

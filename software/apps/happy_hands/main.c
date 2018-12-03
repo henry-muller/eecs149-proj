@@ -16,6 +16,8 @@
 //#include "nrf_drv_pwm.h"
 //#include "nrf_drv_clock.h"
 //#include "nrfx_pwm.h"
+#include "nrf_i2s.h"
+#include "nrfx_i2s.h"
 
 #include "buckler.h"
 // #include "pin_assignments.h"
@@ -32,7 +34,7 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
-int main(void) { // Note that I renamed this to _main so that it wouldn't conflict with the main in main_i2s.c
+int main(void) { 
     // initialize RTT library
     ret_code_t error_code = NRF_SUCCESS;
     error_code = initialize_rtt();
@@ -44,9 +46,20 @@ int main(void) { // Note that I renamed this to _main so that it wouldn't confli
     //nrf_delay_ms(2000);
     printf("RTT working...\n");
     nrf_delay_ms(3000);
+
+    instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    i2s_instrument_init();
+    instrument_state.notes_to_play[0] = C4;
+    while(1) {
+        printf("In while loop\n");
+        i2s_instrument_play(&instrument_state);
+    }
+
+
+
     // Calibrate sensors
-    initialize_flex_sensors();
-    update_flex_sensor_thresholds();
+    //initialize_flex_sensors();
+    //update_flex_sensor_thresholds();
     /*
     int i;
     while(1) {
@@ -56,7 +69,7 @@ int main(void) { // Note that I renamed this to _main so that it wouldn't confli
         printf("\n");
     } */
 
-    nrf_gpio_pin_set(S01_SEL);
+    //nrf_gpio_pin_set(S01_SEL);
     //nrf_gpio_pin_clear(S01_SEL);
     //nrf_gpio_pin_set(S23_SEL);
     //nrf_gpio_pin_clear(S23_SEL);
