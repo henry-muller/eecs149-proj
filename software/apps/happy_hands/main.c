@@ -13,8 +13,8 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
-#include "nrf_i2s.h"
-#include "nrfx_i2s.h"
+//#include "nrf_i2s.h"
+//#include "nrfx_i2s.h"
 
 #include "buckler.h"
 #include "adc.h"
@@ -44,9 +44,9 @@ int main(void) {
     nrf_delay_ms(3000);
 
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
-    printf("Line 47\n");
+    //printf("Line 47\n");
     i2s_instrument_init();
-    printf("Line 49\n");
+    //printf("Line 49\n");
     instrument_state.notes_to_play[0] = C4;
     //instrument_state.notes_to_play[1] = B3;
     while(1) {

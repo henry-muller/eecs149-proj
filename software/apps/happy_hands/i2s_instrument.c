@@ -14,22 +14,14 @@
 #include "nrfx_gpiote.h"
 #include "nrf_i2s.h"
 #include "nrfx_i2s.h"
+#include "nrf_drv_i2s.h"
 
 #include "types.h"
 
-/*
-#define PIN_MCK    (13)
-#define PIN_SCK    (14) // same as BCK
-#define PIN_LRCK   (15)
-#define PIN_SDOUT  (16) // same as DIN
-*/
-#define NRFX_I2S_CONFIG_SCK_PIN 14
-#define NRFX_I2S_CONFIG_LRCK_PIN 15
-#define NRFX_I2S_CONFIG_MCK_PIN 13
-#define NRFX_I2S_CONFIG_SDOUT_PIN 16
-#define NRFX_I2S_CONFIG_SDIN_PIN NRFX_I2S_PIN_NOT_USED
-#define NRFX_I2S_CONFIG_MCK_SETUP 369098752
-#define I2S_CONFIG_RATIO 0
+#define SCK_PIN 14
+#define LRCK_PIN 15
+#define MCK_PIN 13
+#define SDOUT_PIN 16
 
 #define B3_LENGTH 368
 #define C4_LENGTH 347
@@ -151,10 +143,10 @@ static int current_note_array_locations[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 
 static musical_note_t current_notes[NUMBER_OF_NOTE_INDICES];
-static int16_t tx_buffer_0[BUFFER_LENGTH];
-static int16_t tx_buffer_1[BUFFER_LENGTH];
+static int16_t tx_buffer[BUFFER_LENGTH] = {0};
+///static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
 
-static bool is_buffer_1_tx = false;
+// static bool is_buffer_1_tx = false;
 
 int16_t get_next_note_in_array(musical_note_t note) {
     const int16_t* note_array = note_arrays[note];
@@ -165,14 +157,9 @@ int16_t get_next_note_in_array(musical_note_t note) {
     return result;
 }
 
-static nrfx_i2s_config_t const i2s_config = NRFX_I2S_DEFAULT_CONFIG; // Should pull from #defines above!
-
-static void update_buffer(int16_t *buffer) {
+static void update_tx_buffer(int16_t *buffer) {
     int i;
     int j;
-    //int current_note_array_location;
-    //musical_note_t current_note;
-    //const int16_t* current_note_array;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
         for (j = 0; j < BUFFER_LENGTH; j++) {
             if (i == 0) {
@@ -188,164 +175,35 @@ static void update_buffer(int16_t *buffer) {
     // printf("END OF BUFFER\n");
 }
 
-static nrfx_i2s_buffers_t i2s_buffers = {NULL, (uint32_t*) tx_buffer_0};
+static nrfx_i2s_buffers_t const i2s_buffers = {NULL, (uint32_t*) tx_buffer};
 
-static void i2s_data_handler(nrfx_i2s_buffers_t const *p_released, uint32_t status) {
-    //if (status == NRFX_I2S_STATUS_NEXT_BUFFERS_NEEDED) {
-    is_buffer_1_tx  = !is_buffer_1_tx;
-    i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
+static void data_handler(nrfx_i2s_buffers_t const *p_released, uint32_t status) {
+    //is_buffer_1_tx  = !is_buffer_1_tx;
+    //int16_t *other_buffer = 
+    //i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
+    update_tx_buffer((int16_t *) (p_released->p_tx_buffer));
     nrfx_i2s_next_buffers_set(&i2s_buffers);
-    update_buffer((int16_t *) (p_released->p_tx_buffer));
-    //}
+    
 }
 
 void i2s_instrument_init() {
-    APP_ERROR_CHECK(nrfx_i2s_init(&i2s_config, i2s_data_handler));
-    printf("Line 204\n");
-    APP_ERROR_CHECK(nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0)); // divide by 2 cause of (16 bits / 32 bits)
-    printf("Line 206\n");
-    // Hard faulting around here. Check all pointers (one is probably NULL for some reason)
-    
-    /*
-    // Enable transmission
-    NRF_I2S->CONFIG.TXEN = (I2S_CONFIG_TXEN_TXEN_ENABLE << I2S_CONFIG_TXEN_TXEN_Pos);
-
-    // Enable MCK generator
-    NRF_I2S->CONFIG.MCKEN = (I2S_CONFIG_MCKEN_MCKEN_ENABLE << I2S_CONFIG_MCKEN_MCKEN_Pos);
-
-    // MCKFREQ = 2.909 MHz
-    NRF_I2S->CONFIG.MCKFREQ = I2S_CONFIG_MCKFREQ_MCKFREQ_32MDIV11 << I2S_CONFIG_MCKFREQ_MCKFREQ_Pos;
-
-    // Ratio = 32 
-    NRF_I2S->CONFIG.RATIO = I2S_CONFIG_RATIO_RATIO_32X << I2S_CONFIG_RATIO_RATIO_Pos;
-
-    // Master mode, 16Bit, left aligned
-    NRF_I2S->CONFIG.MODE = I2S_CONFIG_MODE_MODE_MASTER << I2S_CONFIG_MODE_MODE_Pos;
-    NRF_I2S->CONFIG.SWIDTH = I2S_CONFIG_SWIDTH_SWIDTH_16BIT << I2S_CONFIG_SWIDTH_SWIDTH_Pos;
-    NRF_I2S->CONFIG.ALIGN = I2S_CONFIG_ALIGN_ALIGN_LEFT << I2S_CONFIG_ALIGN_ALIGN_Pos;
-
-    // Format = I2S
-    NRF_I2S->CONFIG.FORMAT = I2S_CONFIG_FORMAT_FORMAT_I2S << I2S_CONFIG_FORMAT_FORMAT_Pos;
-
-    // Use left channel 
-    NRF_I2S->CONFIG.CHANNELS = I2S_CONFIG_CHANNELS_CHANNELS_LEFT << I2S_CONFIG_CHANNELS_CHANNELS_Pos;
-
-    // Configure pins
-    NRF_I2S->PSEL.MCK = (PIN_MCK << I2S_PSEL_MCK_PIN_Pos);
-    NRF_I2S->PSEL.SCK = (PIN_SCK << I2S_PSEL_SCK_PIN_Pos); 
-    NRF_I2S->PSEL.LRCK = (PIN_LRCK << I2S_PSEL_LRCK_PIN_Pos); 
-    NRF_I2S->PSEL.SDOUT = (PIN_SDOUT << I2S_PSEL_SDOUT_PIN_Pos);
-
-    NRF_I2S->ENABLE = 1;
-
-    // Configure data pointer
-    NRF_I2S->TXD.PTR = (uint32_t)NO_NOTE_array;
-    NRF_I2S->RXTXD.MAXCNT = 1;
-
-    // Start transmitting I2S data
-    NRF_I2S->TASKS_START = 1;
-    */
+    nrfx_i2s_config_t config = NRF_DRV_I2S_DEFAULT_CONFIG;
+    config.sck_pin = SCK_PIN;
+    config.lrck_pin = LRCK_PIN;
+    config.sdout_pin = SDOUT_PIN;
+    config.sdin_pin = NRFX_I2S_PIN_NOT_USED;
+    config.channels = NRF_I2S_CHANNELS_LEFT;
+    config.mck_setup = NRF_I2S_MCK_32MDIV11; // 2.909 MHz
+    config.ratio = NRF_I2S_RATIO_32X; // Divide by 32
+    APP_ERROR_CHECK(nrfx_i2s_init(&config, data_handler));
+    printf("In\n");
+    nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
+    printf("Out\n");
 }
 
-// static void play_wave(int16_t wave_array[], size_t array_size) {
-//     // Configure data pointer
-//     NRF_I2S->TXD.PTR = (uint32_t)wave_array;
-//     NRF_I2S->RXTXD.MAXCNT = (int)(array_size/2);
-// }
-
 void i2s_instrument_play(instrument_state_t* state) {
-    /*
-    // Configure data pointer
-    NRF_I2S->TXD.PTR = (uint32_t)&wave1[0];
-    NRF_I2S->RXTXD.MAXCNT = sizeof(wave1) / sizeof(uint32_t);
-
-    // Start transmitting I2S data
-    NRF_I2S->TASKS_START = 1;
-    */
     int i;
-    //const int16_t* current_note_array;
-    //int current_note_array_location;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
        current_notes[i] = state->notes_to_play[i];
     }
-    // current_note_array = note_arrays[C4];
-    // //current_note_array_location = current_note_array_locations[C4];
-    // for (i = 0; i < note_lengths[C4]; i++) {
-    //     printf("%d\n", current_note_array[i]);
-    // }
-        /*
-        while(1) {
-        play_wave(B3_array, ARRAY_SIZE(B3_array));
-        nrf_delay_ms(2000);
-        play_wave(C4_array, ARRAY_SIZE(C4_array));
-        nrf_delay_ms(2000);
-        play_wave(D4_FLAT_array, ARRAY_SIZE(D4_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(D4_array, ARRAY_SIZE(D4_array));
-        nrf_delay_ms(2000);
-        play_wave(E4_FLAT_array, ARRAY_SIZE(E4_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(E4_array, ARRAY_SIZE(E4_array));
-        nrf_delay_ms(2000);
-        
-        play_wave(F4_array, ARRAY_SIZE(F4_array));
-        nrf_delay_ms(2000);
-        play_wave(G4_FLAT_array, ARRAY_SIZE(G4_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(G4_array, ARRAY_SIZE(G4_array));
-        nrf_delay_ms(2000);
-        play_wave(A4_FLAT_array, ARRAY_SIZE(A4_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(A4_array, ARRAY_SIZE(A4_array));
-        nrf_delay_ms(2000);
-        play_wave(B4_FLAT_array, ARRAY_SIZE(B4_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(B4_array, ARRAY_SIZE(B4_array));
-        nrf_delay_ms(2000);
-        play_wave(C5_array, ARRAY_SIZE(C5_array));
-        nrf_delay_ms(2000);
-        play_wave(D5_FLAT_array, ARRAY_SIZE(D5_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(D5_array, ARRAY_SIZE(D5_array));
-        nrf_delay_ms(2000);
-        play_wave(E5_FLAT_array, ARRAY_SIZE(E5_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(E5_array, ARRAY_SIZE(E5_array));
-        nrf_delay_ms(2000);
-        play_wave(F5_array, ARRAY_SIZE(F5_array));
-        nrf_delay_ms(2000);
-        play_wave(G5_FLAT_array, ARRAY_SIZE(G5_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(G5_array, ARRAY_SIZE(G5_array));
-        nrf_delay_ms(2000);
-        play_wave(A5_FLAT_array, ARRAY_SIZE(A5_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(A5_array, ARRAY_SIZE(A5_array));
-        nrf_delay_ms(2000);
-        play_wave(B5_FLAT_array, ARRAY_SIZE(B5_FLAT_array));
-        nrf_delay_ms(2000);
-        play_wave(B5_array, ARRAY_SIZE(B5_array));
-        nrf_delay_ms(2000);
-        play_wave(C6_array, ARRAY_SIZE(C6_array));
-        nrf_delay_ms(2000);
-        */
 }
-
-/*
-int __main(void) {
-    printf("New main\n");
-    int i;
-    for(i = 0; i < 2000; i++) {
-        printf("%d: %d | %d\n", i, B3_array[i % B3_LENGTH], get_next_note_in_array(B3));
-        nrf_delay_ms(10);
-    }
-    for(i = 0; i < 2000; i++) {
-        printf("%d: %d | %d\n", i, B3_array[i % B3_LENGTH], get_next_note_in_array(B3));
-        nrf_delay_ms(10);
-    }
-    for(i = 0; i < 2000; i++) {
-        printf("%d: %d | %d\n", i, B3_array[i % B3_LENGTH], get_next_note_in_array(B3));
-        nrf_delay_ms(10);
-    }
-}
-*/
