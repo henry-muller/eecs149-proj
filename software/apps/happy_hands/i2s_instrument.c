@@ -197,13 +197,51 @@ void i2s_instrument_init() {
     config.ratio = NRF_I2S_RATIO_32X; // Divide by 32
     APP_ERROR_CHECK(nrfx_i2s_init(&config, data_handler));
     //printf("In\n");
-    nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
+    nrfx_err_t start_err_code;
+    start_err_code = nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
+    printf("%ld", start_err_code);
     //printf("Out\n");
 }
 
-void i2s_instrument_play(instrument_state_t* state) {
+void i2s_instrument_init_hal() {
+    // Enable transmission
+    NRF_I2S->CONFIG.TXEN = (I2S_CONFIG_TXEN_TXEN_ENABLE << I2S_CONFIG_TXEN_TXEN_Pos);
+    // Enable MCK generator
+    NRF_I2S->CONFIG.MCKEN = (I2S_CONFIG_MCKEN_MCKEN_ENABLE << I2S_CONFIG_MCKEN_MCKEN_Pos);
+    // MCKFREQ = 2.909 MHz
+    NRF_I2S->CONFIG.MCKFREQ = I2S_CONFIG_MCKFREQ_MCKFREQ_32MDIV11 << I2S_CONFIG_MCKFREQ_MCKFREQ_Pos;
+    // Ratio = 32 
+    NRF_I2S->CONFIG.RATIO = I2S_CONFIG_RATIO_RATIO_32X << I2S_CONFIG_RATIO_RATIO_Pos;
+    // Master mode, 16Bit, left aligned
+    NRF_I2S->CONFIG.MODE = I2S_CONFIG_MODE_MODE_MASTER << I2S_CONFIG_MODE_MODE_Pos;
+    NRF_I2S->CONFIG.SWIDTH = I2S_CONFIG_SWIDTH_SWIDTH_16BIT << I2S_CONFIG_SWIDTH_SWIDTH_Pos;
+    NRF_I2S->CONFIG.ALIGN = I2S_CONFIG_ALIGN_ALIGN_LEFT << I2S_CONFIG_ALIGN_ALIGN_Pos;
+    // Format = I2S
+    NRF_I2S->CONFIG.FORMAT = I2S_CONFIG_FORMAT_FORMAT_I2S << I2S_CONFIG_FORMAT_FORMAT_Pos;
+    // Use left channel 
+    NRF_I2S->CONFIG.CHANNELS = I2S_CONFIG_CHANNELS_CHANNELS_LEFT << I2S_CONFIG_CHANNELS_CHANNELS_Pos;
+    // Configure pins
+    NRF_I2S->PSEL.MCK = (MCK_PIN << I2S_PSEL_MCK_PIN_Pos);
+    NRF_I2S->PSEL.SCK = (SCK_PIN << I2S_PSEL_SCK_PIN_Pos); 
+    NRF_I2S->PSEL.LRCK = (LRCK_PIN << I2S_PSEL_LRCK_PIN_Pos); 
+    NRF_I2S->PSEL.SDOUT = (SDOUT_PIN << I2S_PSEL_SDOUT_PIN_Pos);
+    NRF_I2S->ENABLE = 1;
+    // Configure data pointer
+    NRF_I2S->TXD.PTR = (uint32_t)NO_NOTE_array;
+    NRF_I2S->RXTXD.MAXCNT = 1;
+    // Start transmitting I2S data
+    NRF_I2S->TASKS_START = 1;
+}
+
+void i2s_instrument_play(instrument_state_t *state) {
     int i;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
        current_notes[i] = state->notes_to_play[i];
     }
+}
+
+void i2s_instrument_play_hal(instrument_state_t *state) {
+    // Configure data pointer
+    NRF_I2S->TXD.PTR = (uint32_t)C4_array;
+    NRF_I2S->RXTXD.MAXCNT = C4_LENGTH/2;
 }

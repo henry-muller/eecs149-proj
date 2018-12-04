@@ -35,22 +35,26 @@ int main(void) {
     APP_ERROR_CHECK(initialize_rtt());
 
     // initialize ADC
-    initialize_adc();
+    //initialize_adc();
 
     //nrf_delay_ms(2000);
     printf("RTT working...\n");
 
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     //printf("Line 47\n");
-    i2s_instrument_init();
+    i2s_instrument_init_hal();
     //printf("Line 49\n");
-    instrument_state.notes_to_play[0] = C4;
+    //instrument_state.notes_to_play[0] = C4;
     //instrument_state.notes_to_play[1] = B3;
+    //i2s_instrument_play_hal(&instrument_state);
     while(1) {
-        printf("In while loop\n");
-        i2s_instrument_play(&instrument_state);
-        //nrf_delay_ms(10);
+        __WFE();
     }
+    // while(1) {
+    //     printf("In while loop\n");
+    //     i2s_instrument_play_hal(&instrument_state);
+    //     //nrf_delay_ms(10);
+    // }
 
 
 
