@@ -196,9 +196,9 @@ void i2s_instrument_init() {
     config.mck_setup = NRF_I2S_MCK_32MDIV11; // 2.909 MHz
     config.ratio = NRF_I2S_RATIO_32X; // Divide by 32
     APP_ERROR_CHECK(nrfx_i2s_init(&config, data_handler));
-    printf("In\n");
+    //printf("In\n");
     nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
-    printf("Out\n");
+    //printf("Out\n");
 }
 
 void i2s_instrument_play(instrument_state_t* state) {

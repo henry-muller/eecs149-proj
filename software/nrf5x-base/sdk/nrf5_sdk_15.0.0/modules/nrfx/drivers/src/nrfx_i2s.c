@@ -257,6 +257,8 @@ nrfx_err_t nrfx_i2s_start(nrfx_i2s_buffers_t const * p_initial_buffers,
 
     nrf_i2s_enable(NRF_I2S);
 
+    printf("LINE 266 OF i2s.C\n");
+
     m_cb.state = NRFX_DRV_STATE_POWERED_ON;
 
     nrf_i2s_event_clear(NRF_I2S, NRF_I2S_EVENT_RXPTRUPD);
@@ -265,7 +267,7 @@ nrfx_err_t nrfx_i2s_start(nrfx_i2s_buffers_t const * p_initial_buffers,
     nrf_i2s_int_enable(NRF_I2S, (m_cb.use_rx ? NRF_I2S_INT_RXPTRUPD_MASK : 0) |
                                 (m_cb.use_tx ? NRF_I2S_INT_TXPTRUPD_MASK : 0) |
                                 NRF_I2S_INT_STOPPED_MASK);
-    nrf_i2s_task_trigger(NRF_I2S, NRF_I2S_TASK_START);
+    nrf_i2s_task_trigger(NRF_I2S, NRF_I2S_TASK_START); // THIS LINE IS CAUSING THE HARDFAULT
 
     NRFX_LOG_INFO("Started.");
     return NRFX_SUCCESS;

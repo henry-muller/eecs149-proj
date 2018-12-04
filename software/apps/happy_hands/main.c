@@ -32,16 +32,13 @@ ret_code_t initialize_rtt() {
 
 int main(void) { 
     // initialize RTT library
-    ret_code_t error_code = NRF_SUCCESS;
-    error_code = initialize_rtt();
-    APP_ERROR_CHECK(error_code);
+    APP_ERROR_CHECK(initialize_rtt());
 
     // initialize ADC
     initialize_adc();
 
     //nrf_delay_ms(2000);
     printf("RTT working...\n");
-    nrf_delay_ms(3000);
 
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     //printf("Line 47\n");
@@ -52,7 +49,7 @@ int main(void) {
     while(1) {
         printf("In while loop\n");
         i2s_instrument_play(&instrument_state);
-        nrf_delay_ms(10);
+        //nrf_delay_ms(10);
     }
 
 
