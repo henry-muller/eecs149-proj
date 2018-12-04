@@ -44,12 +44,15 @@ int main(void) {
     nrf_delay_ms(3000);
 
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    printf("Line 47\n");
     i2s_instrument_init();
+    printf("Line 49\n");
     instrument_state.notes_to_play[0] = C4;
     //instrument_state.notes_to_play[1] = B3;
     while(1) {
-        //printf("In while loop\n");
+        printf("In while loop\n");
         i2s_instrument_play(&instrument_state);
+        nrf_delay_ms(10);
     }
 
 
@@ -77,20 +80,19 @@ int main(void) {
 
 
     //initialize_rotary_switch();
-
     /*
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
     i2s_instrument_play(&instrument_state);
     while(1) {
         __WFE();
-        /*
+        
         int i;
         for (i = 0; i < NUMBER_OF_SENSORS; i++) {
             printf("%d ", is_sensor_flexed(i));
         }
         printf("\n");
-        */
+    */
         //update_instrument_state(&instrument_state);
         //i2s_instrument_play(&instrument_state);
 }
