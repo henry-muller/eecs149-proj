@@ -87,10 +87,23 @@ int main(void) {
 
     //initialize_rotary_switch();
     
-    instrument_state_t instrument_state = {{C4, E4, G4, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    instrument_state_t instrument_state = {{C4, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
+    while(1) {
+        i2s_instrument_play(&instrument_state);
+    }
     //instrument_state.notes_to_play[0] = C4;
-    i2s_instrument_play(&instrument_state);
+    // bool add_G4 = false;
+    // while(1) {
+    //     if (add_G4) {
+    //         instrument_state.notes_to_play[2] = G4;
+    //     } else {
+    //         instrument_state.notes_to_play[2] = NO_NOTE;
+    //     }
+    //     add_G4 = !add_G4;
+    //     i2s_instrument_play(&instrument_state);
+    //     nrf_delay_ms(1000);
+    // }
     // while(1) {
     //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
     //         printf("%d ", is_sensor_flexed(i));

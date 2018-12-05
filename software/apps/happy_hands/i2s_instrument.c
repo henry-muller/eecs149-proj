@@ -177,7 +177,7 @@ static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
 
 static bool is_buffer_1_tx = false;
 static bool swing = true;
-static int shrink = 10; 
+static int shrink = 5; 
 
 int16_t get_next_note_in_array(musical_note_t note) {
     const int16_t* note_array = note_arrays[note];
