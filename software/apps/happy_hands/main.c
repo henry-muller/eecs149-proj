@@ -42,14 +42,16 @@ int main(void) {
 
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     //printf("Line 47\n");
-    i2s_instrument_init_hal();
+    i2s_instrument_init();
+    printf("Help me pls\n");
+    i2s_instrument_play(&instrument_state);
     //printf("Line 49\n");
     //instrument_state.notes_to_play[0] = C4;
     //instrument_state.notes_to_play[1] = B3;
     //i2s_instrument_play_hal(&instrument_state);
-    while(1) {
-        __WFE();
-    }
+    // while(1) {
+    //     __WFE();
+    // }
     // while(1) {
     //     printf("In while loop\n");
     //     i2s_instrument_play_hal(&instrument_state);

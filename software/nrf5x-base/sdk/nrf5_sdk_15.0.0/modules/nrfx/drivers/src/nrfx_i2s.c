@@ -257,7 +257,7 @@ nrfx_err_t nrfx_i2s_start(nrfx_i2s_buffers_t const * p_initial_buffers,
 
     nrf_i2s_enable(NRF_I2S);
 
-    printf("LINE 266 OF i2s.C\n");
+    //printf("LINE 266 OF i2s.C\n");
 
     m_cb.state = NRFX_DRV_STATE_POWERED_ON;
 
