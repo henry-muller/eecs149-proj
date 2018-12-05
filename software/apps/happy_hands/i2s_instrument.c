@@ -18,10 +18,10 @@
 
 #include "types.h"
 
-#define SCK_PIN 14
+#define SCK_PIN 14 // same as BCK
 #define LRCK_PIN 15
 #define MCK_PIN 13
-#define SDOUT_PIN 16
+#define SDOUT_PIN 16 // same as DIN
 
 #define B3_LENGTH 368
 #define C4_LENGTH 347
@@ -249,17 +249,38 @@ void i2s_instrument_play(instrument_state_t *state) {
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
        current_notes[i] = state->notes_to_play[i];
     }
-    printf("line 251\n");
+    //printf("line 251\n");
     //nrf_delay_ms(1000);
 }
 
-static void play_wave_hal(musical_note_t note) {
+//static void play_wave_hal(musical_note_t note) {
     // Configure data pointer
-    NRF_I2S->TXD.PTR = (uint32_t)note_arrays[note];
-    NRF_I2S->RXTXD.MAXCNT = (int)(note_lengths[note]/2);
+    //printf("in play_Wave_hal\n");
+    //NRF_I2S->TXD.PTR = (uint32_t)&note_arrays[note][0];
+    //NRF_I2S->RXTXD.MAXCNT = (int)(note_lengths[note]/2);
+//}
+
+static void play_wave(int16_t wave_array[], size_t array_size) {
+    // Configure data pointer
+    NRF_I2S->TXD.PTR = (uint32_t)wave_array;
+    NRF_I2S->RXTXD.MAXCNT = (int)(array_size/2);
 }
 
 void i2s_instrument_play_hal(instrument_state_t *state) {
-    play_wave_hal(A4);
-    //nrf_delay_ms(2000);
+    //printf("In play fn\n");
+    // int i = 0;
+    // bool still_looking = true;
+    // while (i < NUMBER_OF_NOTE_INDICES && still_looking) {
+    //     if (state->notes_to_play[i]!= NO_NOTE) {
+    //         printf("note: %d\n", state->notes_to_play[i]);
+    //         play_wave_hal(state->notes_to_play[i]);
+    //         still_looking = false;
+    //     }
+    //     i++;
+    // }
+    //play_wave_hal(G4_FLAT);
+    //play_wave_hal(G4_FLAT_array, ARRAY_SIZE(G4_FLAT_array));
+    //NRF_I2S->TXD.PTR = (uint32_t)C4_array;
+    //NRF_I2S->RXTXD.MAXCNT = C4_LENGTH/2;
+    play_wave(B3_array, ARRAY_SIZE(B3_array));
 }
