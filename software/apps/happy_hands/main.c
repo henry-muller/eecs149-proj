@@ -87,7 +87,7 @@ int main(void) {
 
     //initialize_rotary_switch();
     
-    instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    instrument_state_t instrument_state = {{B3, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
     //instrument_state.notes_to_play[0] = C4;
     i2s_instrument_play(&instrument_state);
