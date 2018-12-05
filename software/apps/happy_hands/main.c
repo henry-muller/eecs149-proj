@@ -89,7 +89,7 @@ int main(void) {
     
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
-    instrument_state.notes_to_play[0] = C4;
+    //instrument_state.notes_to_play[0] = C4;
     i2s_instrument_play(&instrument_state);
     // while(1) {
     //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {

@@ -143,10 +143,10 @@ static int current_note_array_locations[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 
 static musical_note_t current_notes[NUMBER_OF_NOTE_INDICES];
-static int16_t tx_buffer[BUFFER_LENGTH] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-///static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
+static int16_t tx_buffer_0[BUFFER_LENGTH] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static int16_t tx_buffer_1[BUFFER_LENGTH] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-// static bool is_buffer_1_tx = false;
+static bool is_buffer_1_tx = false;
 
 int16_t get_next_note_in_array(musical_note_t note) {
     const int16_t* note_array = note_arrays[note];
@@ -158,6 +158,7 @@ int16_t get_next_note_in_array(musical_note_t note) {
 }
 
 static void update_tx_buffer(int16_t *buffer) {
+    printf("update_tx_buffer called\n");
     int i;
     int j;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
@@ -175,13 +176,12 @@ static void update_tx_buffer(int16_t *buffer) {
     // printf("END OF BUFFER\n");
 }
 
-static nrfx_i2s_buffers_t const i2s_buffers = {NULL, (uint32_t*) tx_buffer};
+static nrfx_i2s_buffers_t i2s_buffers = {NULL, (uint32_t*) tx_buffer_0};
 
 static void data_handler(nrfx_i2s_buffers_t const *p_released, uint32_t status) {
-    //printf("data_handler\n");
-    //is_buffer_1_tx  = !is_buffer_1_tx;
-    //int16_t *other_buffer = 
-    //i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
+    printf("data_handler called\n");
+    is_buffer_1_tx  = !is_buffer_1_tx;
+    i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
     update_tx_buffer((int16_t *) (p_released->p_tx_buffer));
     nrfx_i2s_next_buffers_set(&i2s_buffers);
     
