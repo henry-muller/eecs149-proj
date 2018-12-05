@@ -200,7 +200,7 @@ void i2s_instrument_init() {
     //printf("In\n");
     nrfx_err_t start_err_code;
     start_err_code = nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
-    printf("%ld", start_err_code);
+    printf("nrfx_i2s_start error code: %ld\n", start_err_code);
     //printf("Out\n");
 }
 
