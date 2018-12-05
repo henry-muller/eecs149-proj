@@ -266,17 +266,21 @@ static void play_wave_hal(musical_note_t note) {
 
 void i2s_instrument_play_hal(instrument_state_t *state) {
     //printf("In play fn\n");
-    // int i = 0;
-    // bool still_looking = true;
-    // while (i < NUMBER_OF_NOTE_INDICES && still_looking) {
-    //     if (state->notes_to_play[i]!= NO_NOTE) {
-    //         printf("note: %d\n", state->notes_to_play[i]);
-    //         play_wave_hal(state->notes_to_play[i]);
-    //         still_looking = false;
-    //     }
-    //     i++;
-    // }
-    play_wave_hal(B3);
+    int i = 0;
+    //bool still_looking = true;
+    while (i < NUMBER_OF_NOTE_INDICES) {
+        if (state->notes_to_play[i]!= NO_NOTE) {
+            printf("note: %d\n", state->notes_to_play[i]);
+            play_wave_hal(state->notes_to_play[i]);
+            break;
+        }
+        if (i == NUMBER_OF_NOTE_INDICES - 1) {
+            play_wave_hal(NO_NOTE);
+        }
+        i++;
+    }
+
+    //play_wave_hal(B3);
     //play_wave_hal(G4_FLAT_array, ARRAY_SIZE(G4_FLAT_array));
     //NRF_I2S->TXD.PTR = (uint32_t)C4_array;
     //NRF_I2S->RXTXD.MAXCNT = C4_LENGTH/2;
