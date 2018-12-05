@@ -143,8 +143,8 @@ static int current_note_array_locations[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 
 static musical_note_t current_notes[NUMBER_OF_NOTE_INDICES];
-static int16_t tx_buffer_0[BUFFER_LENGTH] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static int16_t tx_buffer_1[BUFFER_LENGTH] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static int16_t tx_buffer_0[BUFFER_LENGTH] = {0};
+static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
 
 static bool is_buffer_1_tx = false;
 
@@ -158,28 +158,27 @@ int16_t get_next_note_in_array(musical_note_t note) {
 }
 
 static void update_tx_buffer(int16_t *buffer) {
-    printf("update_tx_buffer called\n");
-    int i;
-    int j;
-    for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
-        for (j = 0; j < BUFFER_LENGTH; j++) {
-            if (i == 0) {
-                buffer[j] = 0;
-            }
-            buffer[j] += get_next_note_in_array(current_notes[i]);
-        }
-    }
-    // printf("START OF BUFFER\n");
-    // for (i = 0; i < BUFFER_LENGTH; i++) {
-    //     printf("%d ", buffer[i]);
+    //printf("update_tx_buffer called\n");
+    // int i;
+    // int j;
+    // for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
+    //     for (j = 0; j < BUFFER_LENGTH; j++) {
+    //         if (i == 0) {
+    //             buffer[j] = 0;
+    //         }
+    //         buffer[j] += get_next_note_in_array(current_notes[i]);
+    //     }
     // }
-    // printf("END OF BUFFER\n");
+    int i;
+    for (i = 0; i < BUFFER_LENGTH; i++) {
+        buffer[i] = get_next_note_in_array(B3);
+    }
 }
 
 static nrfx_i2s_buffers_t i2s_buffers = {NULL, (uint32_t*) tx_buffer_0};
 
 static void data_handler(nrfx_i2s_buffers_t const *p_released, uint32_t status) {
-    printf("data_handler called\n");
+    //printf("data_handler called\n");
     is_buffer_1_tx  = !is_buffer_1_tx;
     i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
     update_tx_buffer((int16_t *) (p_released->p_tx_buffer));
