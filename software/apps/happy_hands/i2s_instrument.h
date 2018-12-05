@@ -1,5 +1,5 @@
-#ifndef NEW_INSTRUMENT_H
-#define NEW_INSTRUMENT_H
+#ifndef I2S_INSTRUMENT_H
+#define I2S_INSTRUMENT_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -16,12 +16,17 @@
 #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
 
+#include "nrf_i2s.h"
+#include "nrfx_i2s.h"
+
 #include "types.h"
 
-#define INSTRUMENT_OUTPUT_PIN NRF_GPIO_PIN_MAP(0, 17)
+void i2s_instrument_init();
 
-void new_instrument_init();
+void i2s_instrument_play(instrument_state_t *state);
 
-void new_instrument_play(instrument_state_t* state);
+void i2s_instrument_init_hal();
 
-#endif NEW_INSTRUMENT_H
+void i2s_instrument_play_hal(instrument_state_t *state);
+
+#endif /* I2S_INSTRUMENT_H */

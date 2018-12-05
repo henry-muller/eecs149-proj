@@ -25,8 +25,6 @@
 
 nrf_saadc_value_t get_accelerometer_adc();
 
-// volume_command_t get_volume_command();
-
 void initialize_accelerometer();
 
 #endif /*  ACCELEROMETER_HANDLER_H */
