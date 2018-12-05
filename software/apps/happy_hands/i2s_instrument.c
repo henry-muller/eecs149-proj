@@ -51,7 +51,7 @@
 #define C6_LENGTH 87
 #define NO_NOTE_LENGTH 2
 
-#define BUFFER_LENGTH 10
+#define BUFFER_LENGTH 7500
 
 static int16_t B3_array[B3_LENGTH] = {199, 682, 1156, 1628, 2091, 2551, 2995, 3441, 3872, 4297, 4707, 5110, 5499, 5880, 6243, 6603, 6946, 7283, 7604, 7918, 8217, 8509, 8782, 9054, 9310, 9562, 9801, 10036, 10259, 10479, 10685, 10892, 11087, 11281, 11467, 11652, 11828, 12007, 12178, 12351, 12517, 12684, 12845, 13008, 13162, 13321, 13473, 13628, 13776, 13927, 14070, 14214, 14348, 14483, 14608, 14733, 14848, 14962, 15066, 15170, 15263, 15358, 15443, 15527, 15603, 15678, 15744, 15809, 15865, 15921, 15968, 16015, 16053, 16091, 16121, 16150, 16170, 16190, 16200, 16208, 16206, 16203, 16190, 16174, 16149, 16123, 16088, 16052, 16008, 15965, 15914, 15863, 15803, 15743, 15673, 15600, 15516, 15428, 15328, 15224, 15108, 14987, 14854, 14718, 14568, 14415, 14252, 14082, 13902, 13717, 13521, 13321, 13110, 12896, 12673, 12444, 12207, 11965, 11714, 11460, 11198, 10935, 10669, 10396, 10123, 9848, 9572, 9295, 9015, 8733, 8447, 8153, 7853, 7546, 7230, 6909, 6581, 6254, 5927, 5599, 5280, 4968, 4666, 4375, 4092, 3820, 3555, 3294, 3037, 2781, 2527, 2273, 2019, 1768, 1521, 1274, 1033, 798, 570, 349, 138, -64, -258, -449, -630, -807, -978, -1144, -1306, -1463, -1615, -1766, -1909, -2048, -2180, -2306, -2423, -2535, -2635, -2729, -2817, -2903, -2987, -3075, -3165, -3263, -3368, -3483, -3603, -3729, -3859, -3990, -4118, -4245, -4366, -4482, -4592, -4698, -4800, -4899, -4996, -5093, -5189, -5288, -5387, -5486, -5584, -5682, -5776, -5871, -5960, -6047, -6129, -6208, -6282, -6353, -6418, -6482, -6540, -6595, -6645, -6692, -6734, -6774, -6807, -6838, -6862, -6883, -6897, -6907, -6910, -6909, -6902, -6892, -6876, -6858, -6835, -6811, -6785, -6757, -6726, -6696, -6663, -6631, -6597, -6565, -6533, -6504, -6476, -6450, -6427, -6406, -6388, -6372, -6358, -6347, -6338, -6332, -6329, -6329, -6337, -6351, -6374, -6407, -6451, -6508, -6577, -6656, -6748, -6847, -6957, -7075, -7200, -7331, -7470, -7613, -7766, -7923, -8087, -8258, -8435, -8616, -8803, -8995, -9190, -9389, -9593, -9807, -10027, -10257, -10498, -10749, -11011, -11279, -11555, -11839, -12122, -12408, -12691, -12970, -13244, -13513, -13775, -14034, -14280, -14521, -14747, -14963, -15162, -15348, -15515, -15670, -15806, -15932, -16041, -16142, -16229, -16309, -16370, -16386, -16381, -16385, -16381, -16386, -16380, -16388, -16359, -16265, -16143, -16003, -15835, -15653, -15445, -15221, -14973, -14712, -14426, -14129, -13806, -13475, -13121, -12753, -12366, -11969, -11552, -11128, -10682, -10237, -9772, -9302, -8819, -8333, -7837, -7342, -6834, -6334, -5823, -5312, -4798, -4287, -3773, -3266, -2755, -2257, -1756, -1260, -766, -279};
 static int16_t C4_array[C4_LENGTH] = {200, 711, 1214, 1712, 2204, 2686, 3158, 3625, 4078, 4522, 4952, 5371, 5776, 6167, 6547, 6916, 7271, 7615, 7943, 8263, 8566, 8857, 9140, 9410, 9671, 9922, 10165, 10400, 10623, 10841, 11052, 11257, 11456, 11651, 11839, 12027, 12210, 12390, 12568, 12742, 12914, 13082, 13248, 13414, 13575, 13736, 13894, 14049, 14199, 14344, 14486, 14620, 14749, 14872, 14989, 15101, 15206, 15306, 15402, 15491, 15576, 15655, 15728, 15796, 15858, 15916, 15969, 16016, 16058, 16096, 16129, 16156, 16178, 16195, 16204, 16208, 16205, 16195, 16178, 16156, 16126, 16093, 16052, 16008, 15960, 15907, 15850, 15788, 15720, 15646, 15563, 15473, 15372, 15264, 15145, 15018, 14881, 14735, 14579, 14416, 14244, 14062, 13871, 13671, 13463, 13247, 13022, 12791, 12551, 12304, 12049, 11785, 11517, 11241, 10961, 10680, 10391, 10102, 9809, 9516, 9222, 8924, 8624, 8317, 8002, 7680, 7349, 7011, 6664, 6317, 5970, 5622, 5283, 4953, 4634, 4326, 4028, 3742, 3463, 3187, 2916, 2646, 2377, 2107, 1839, 1576, 1314, 1058, 808, 566, 333, 110, -103, -308, -508, -698, -884, -1062, -1236, -1404, -1567, -1727, -1882, -2030, -2171, -2304, -2429, -2545, -2651, -2750, -2842, -2932, -3023, -3116, -3216, -3324, -3442, -3568, -3700, -3837, -3976, -4113, -4247, -4375, -4497, -4613, -4724, -4832, -4936, -5039, -5141, -5244, -5350, -5454, -5558, -5662, -5763, -5863, -5959, -6050, -6138, -6220, -6298, -6372, -6441, -6506, -6566, -6622, -6673, -6720, -6762, -6800, -6833, -6860, -6882, -6898, -6907, -6911, -6908, -6900, -6887, -6869, -6848, -6824, -6797, -6768, -6736, -6704, -6670, -6635, -6600, -6566, -6532, -6501, -6472, -6444, -6421, -6400, -6381, -6365, -6352, -6341, -6333, -6329, -6329, -6335, -6349, -6372, -6407, -6454, -6516, -6591, -6678, -6778, -6887, -7007, -7136, -7272, -7415, -7566, -7725, -7891, -8063, -8244, -8430, -8623, -8822, -9025, -9233, -9445, -9665, -9894, -10131, -10382, -10643, -10916, -11199, -11489, -11788, -12090, -12392, -12693, -12988, -13279, -13562, -13840, -14111, -14370, -14620, -14854, -15074, -15277, -15462, -15630, -15779, -15914, -16033, -16139, -16233, -16315, -16376, -16384, -16383, -16383, -16383, -16383, -16383, -16381, -16304, -16181, -16039, -15867, -15675, -15458, -15219, -14958, -14676, -14373, -14051, -13706, -13348, -12966, -12567, -12150, -11717, -11269, -10805, -10330, -9844, -9342, -8835, -8316, -7793, -7263, -6729, -6194, -5653, -5108, -4566, -4021, -3481, -2939, -2407, -1878, -1349, -826, -308};
@@ -139,6 +139,35 @@ static const int note_lengths[27] = {
     C6_LENGTH,
     NO_NOTE_LENGTH
 };
+static bool is_note_present[27] = {
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+};
 static int current_note_array_locations[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
@@ -147,6 +176,8 @@ static int16_t tx_buffer_0[BUFFER_LENGTH] = {0};
 static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
 
 static bool is_buffer_1_tx = false;
+static bool swing = true;
+static int shrink = 10; 
 
 int16_t get_next_note_in_array(musical_note_t note) {
     const int16_t* note_array = note_arrays[note];
@@ -154,33 +185,108 @@ int16_t get_next_note_in_array(musical_note_t note) {
     int current_note_array_location = current_note_array_locations[note];
     int16_t result = note_array[current_note_array_location];
     current_note_array_locations[note] = (current_note_array_locations[note] + 1) % note_array_length;
-    return result;
+    return result / shrink;
 }
 
 static void update_tx_buffer(int16_t *buffer) {
     //printf("update_tx_buffer called\n");
-    // int i;
-    // int j;
-    // for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
-    //     for (j = 0; j < BUFFER_LENGTH; j++) {
-    //         if (i == 0) {
-    //             buffer[j] = 0;
-    //         }
-    //         buffer[j] += get_next_note_in_array(current_notes[i]);
-    //     }
-    // }
     int i;
     for (i = 0; i < BUFFER_LENGTH; i++) {
-        buffer[i] = get_next_note_in_array(B3);
+        buffer[i] = 0;
+        if (is_note_present[B3]) {
+            buffer[i] += get_next_note_in_array(B3);
+        }
+        if (is_note_present[C4]) {
+            buffer[i] += get_next_note_in_array(C4);
+        }
+        if (is_note_present[D4_FLAT]) {
+            buffer[i] += get_next_note_in_array(D4_FLAT);
+        }
+        if (is_note_present[D4]) {
+            buffer[i] += get_next_note_in_array(D4);
+        }
+        if (is_note_present[E4_FLAT]) {
+            buffer[i] += get_next_note_in_array(E4_FLAT);
+        }
+        if (is_note_present[E4]) {
+            buffer[i] += get_next_note_in_array(E4);
+        }
+        if (is_note_present[F4]) {
+            buffer[i] += get_next_note_in_array(F4);
+        }
+        if (is_note_present[G4_FLAT]) {
+            buffer[i] += get_next_note_in_array(G4_FLAT);
+        }
+        if (is_note_present[G4]) {
+            buffer[i] += get_next_note_in_array(G4);
+        }
+        if (is_note_present[A4_FLAT]) {
+            buffer[i] += get_next_note_in_array(A4_FLAT);
+        }
+        if (is_note_present[A4]) {
+            buffer[i] += get_next_note_in_array(A4);
+        }
+        if (is_note_present[B4_FLAT]) {
+            buffer[i] += get_next_note_in_array(B4_FLAT);
+        }
+        if (is_note_present[B4]) {
+            buffer[i] += get_next_note_in_array(B4);
+        }
+        if (is_note_present[C5]) {
+            buffer[i] += get_next_note_in_array(C5);
+        }
+        if (is_note_present[D5_FLAT]) {
+            buffer[i] += get_next_note_in_array(D5_FLAT);
+        }
+        if (is_note_present[D5]) {
+            buffer[i] += get_next_note_in_array(D5);
+        }
+        if (is_note_present[E5_FLAT]) {
+            buffer[i] += get_next_note_in_array(E5_FLAT);
+        }
+        if (is_note_present[E5]) {
+            buffer[i] += get_next_note_in_array(E5);
+        }
+        if (is_note_present[F5]) {
+            buffer[i] += get_next_note_in_array(F5);
+        }
+        if (is_note_present[G5_FLAT]) {
+            buffer[i] += get_next_note_in_array(G5_FLAT);
+        }
+        if (is_note_present[G5]) {
+            buffer[i] += get_next_note_in_array(G5);
+        }
+        if (is_note_present[A5_FLAT]) {
+            buffer[i] += get_next_note_in_array(A5_FLAT);
+        }
+        if (is_note_present[A5]) {
+            buffer[i] += get_next_note_in_array(A5);
+        }
+        if (is_note_present[B5_FLAT]) {
+            buffer[i] += get_next_note_in_array(B5_FLAT);
+        }
+        if (is_note_present[B5]) {
+            buffer[i] += get_next_note_in_array(B5);
+        }
+        if (is_note_present[C6]) {
+            buffer[i] += get_next_note_in_array(C6);
+        }
     }
+    // int i;
+    // for (i = 0; i < BUFFER_LENGTH; i++) {
+    //     buffer[i] = get_next_note_in_array(C4)/50 + get_next_note_in_array(E4)/50;// + get_next_note_in_array(G4)/10;
+    //     printf("%d\n", buffer[i]);
+    // }
 }
 
 static nrfx_i2s_buffers_t i2s_buffers = {NULL, (uint32_t*) tx_buffer_0};
 
 static void data_handler(nrfx_i2s_buffers_t const *p_released, uint32_t status) {
     //printf("data_handler called\n");
-    is_buffer_1_tx  = !is_buffer_1_tx;
-    i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
+    if(swing) {
+        is_buffer_1_tx  = !is_buffer_1_tx;
+        i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
+    }
     update_tx_buffer((int16_t *) (p_released->p_tx_buffer));
     nrfx_i2s_next_buffers_set(&i2s_buffers);
     
@@ -246,7 +352,7 @@ void i2s_instrument_init_hal() {
 void i2s_instrument_play(instrument_state_t *state) {
     int i;
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
-       current_notes[i] = state->notes_to_play[i];
+       is_note_present[state->notes_to_play[i]] = true;
     }
     //printf("line 251\n");
     //nrf_delay_ms(1000);
