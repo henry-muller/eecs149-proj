@@ -32,6 +32,7 @@ static void saadc_callback(nrfx_saadc_evt_t const * p_event) {
             printf("High Interrupt\n");
         }
     }
+    printf("Done with IRQ\n");
 }
 
 static bool _is_adc_initialized = false;

@@ -31,6 +31,8 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
+bool demo_mode = true;
+
 int main(void) { 
     // initialize RTT library
     APP_ERROR_CHECK(initialize_rtt());
@@ -41,120 +43,27 @@ int main(void) {
     //nrf_delay_ms(2000);
     printf("RTT working...\n");
 
-    //instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
-    //printf("Line 47\n");
-    //i2s_instrument_init();
-    //printf("Help me pls\n");
-    //i2s_instrument_play(&instrument_state);
-    //printf("Line 49\n");
-    //instrument_state.notes_to_play[0] = C4;
-    //instrument_state.notes_to_play[1] = B3;
-    //i2s_instrument_play_hal(&instrument_state);
-    // while(1) {
-    //     __WFE();
+    // for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+    //   printf("%d ",  get_sensor_value(i));
     // }
-    // while(1) {
-    //     printf("In while loop\n");
-    //     i2s_instrument_play_hal(&instrument_state);
-    //     //nrf_delay_ms(10);
-    // }
+    // printf("\n");
+    // printf("%d\n", get_rotary_switch_position());
 
 
-
-    // Calibrate sensors
-    initialize_flex_sensors();
-    //update_flex_sensor_thresholds();
-    initialize_rotary_switch();
-    //initialize_accelerometer();
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
-    i2s_instrument_init();
-    //int i;
-    while(1) {
-        // for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        //   printf("%d ",  get_sensor_value(i));
-        // }
-        // printf("\n");
-        // printf("%d\n", get_rotary_switch_position());
-        //printf("vol: %d\n", instrument_state.volume_level);
-        //printf("acc: %d\n", get_accelerometer_adc());
-        update_instrument_state(&instrument_state);
-        i2s_instrument_play(&instrument_state);
-        //nrf_delay_ms(10);
-    }
-
-
-    // int i;
-    // while(1) {
-    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-    //         printf("%d ", is_sensor_flexed(i));
-    //     }
-    //     printf("\n");
-    //     //nrf_delay_ms(100);
-    // }
-    //update_flex_sensor_thresholds();
-    //initialize_rotary_switch();
-    //int i;
-    // while(1) {
-    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-    //         printf("%d ", is_sensor_flexed(i));
-    //     }
-    //     printf("%d\n", get_rotary_switch_position());
-    // } 
-    // while(1) {
-    //     printf("%d\n", get_rotary_switch_position());
-    //     nrf_delay_ms(100);
-    // }
-    //nrf_gpio_pin_set(S01_SEL);
-    //nrf_gpio_pin_clear(S01_SEL);
-    //nrf_gpio_pin_set(S23_SEL);
-    //nrf_gpio_pin_clear(S23_SEL);
-    //nrf_gpio_pin_set(S67_SEL);
-    //nrf_gpio_pin_clear(S67_SEL);
-    //nrf_gpio_pin_set(S89_SEL);
-    //nrf_gpio_pin_clear(S89_SEL);
-
-
-    // initialize_rotary_switch();
-    // while(1) {
-    //     printf("%d\n", get_rotary_switch_position());
-    //     //printf("%d\n", sample_adc_value(0));
-    // }
-    
-    // instrument_state_t instrument_state = {{C4, E4, G4, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
-    // i2s_instrument_init();
-    // while(1) {
-    //      i2s_instrument_play(&instrument_state);
-    // }
-    //instrument_state.notes_to_play[0] = C4;
-    // bool add_G4 = false;
-    // while(1) {
-    //     if (add_G4) {
-    //         instrument_state.notes_to_play[2] = G4;
-    //     } else {
-    //         instrument_state.notes_to_play[2] = NO_NOTE;
-    //     }
-    //     add_G4 = !add_G4;
-    //     i2s_instrument_play(&instrument_state);
-    //     nrf_delay_ms(1000);
-    // }
-    // while(1) {
-    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-    //         printf("%d ", is_sensor_flexed(i));
-    //     }
-    //     printf("%d\n", get_rotary_switch_position());
-    //     update_instrument_state(&instrument_state);
-    //     i2s_instrument_play_hal(&instrument_state);
-    // }
-    /*
-    while(1) {
-        __WFE();
-        
-        int i;
-        for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-            printf("%d ", is_sensor_flexed(i));
+    if (demo_mode) {
+        initialize_flex_sensors();
+        initialize_rotary_switch();
+        i2s_instrument_init();
+        while(1) {
+            update_instrument_state(&instrument_state);
+            i2s_instrument_play(&instrument_state);
         }
-        printf("\n");
-    */
-        //update_instrument_state(&instrument_state);
-        //i2s_instrument_play(&instrument_state);
+    } else {
+        initialize_accelerometer();
+        while(1) {
+            printf("vol: %d\n", instrument_state.volume_level);
+            printf("acc: %d\n", get_accelerometer_adc());
+        }
+    }
 }
