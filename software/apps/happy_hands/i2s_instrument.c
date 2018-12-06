@@ -81,7 +81,7 @@ static int16_t B5_array[B5_LENGTH] = {201, 2092, 3872, 5500, 6946, 8218, 9310, 1
 static int16_t C6_array[C6_LENGTH] = {203, 2196, 4069, 5761, 7256, 8548, 9654, 10606, 11438, 12191, 12894, 13555, 14179, 14730, 15190, 15561, 15848, 16050, 16174, 16206, 16134, 15972, 15738, 15400, 14920, 14294, 13527, 12626, 11605, 10486, 9324, 8115, 6793, 5411, 4144, 3025, 1951, 913, -10, -801, -1493, -2105, -2601, -2978, -3381, -3905, -4433, -4880, -5291, -5707, -6088, -6401, -6642, -6814, -6902, -6896, -6814, -6692, -6554, -6437, -6360, -6329, -6381, -6614, -7040, -7606, -8288, -9072, -9944, -10974, -12148, -13333, -14413, -15309, -15932, -16318, -16392, -16347, -15858, -14928, -13683, -12119, -10304, -8291, -6175, -4008, -1871};
 static int16_t NO_NOTE_array[NO_NOTE_LENGTH] = {0, 0};
 
-static int16_t* note_arrays[27] = {
+static int16_t* note_arrays[NUMBER_OF_NOTES] = {
     B3_array,
     C4_array,
     D4_FLAT_array,
@@ -110,7 +110,7 @@ static int16_t* note_arrays[27] = {
     C6_array,
     NO_NOTE_array
 };
-static const int note_lengths[27] = {
+static const int note_lengths[NUMBER_OF_NOTES] = {
     B3_LENGTH,
     C4_LENGTH,
     D4_FLAT_LENGTH,
@@ -139,7 +139,7 @@ static const int note_lengths[27] = {
     C6_LENGTH,
     NO_NOTE_LENGTH
 };
-static bool is_note_present[27] = {
+static bool is_note_present[NUMBER_OF_NOTES] = {
     false,
     false,
     false,
@@ -303,9 +303,9 @@ void i2s_instrument_init() {
     config.ratio = NRF_I2S_RATIO_32X; // Divide by 32
     APP_ERROR_CHECK(nrfx_i2s_init(&config, data_handler));
     //printf("In\n");
-    nrfx_err_t start_err_code;
-    start_err_code = nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
-    printf("nrfx_i2s_start error code: %ld\n", start_err_code);
+    //nrfx_err_t start_err_code;
+    nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
+    //printf("nrfx_i2s_start error code: %ld\n", start_err_code);
     //printf("Out\n");
 }
 
@@ -351,6 +351,9 @@ void i2s_instrument_init_hal() {
 
 void i2s_instrument_play(instrument_state_t *state) {
     int i;
+    for (i = 0; i < NUMBER_OF_NOTES; i++) {
+       is_note_present[i] = false;
+    }
     for (i = 0; i < NUMBER_OF_NOTE_INDICES; i++) {
        is_note_present[state->notes_to_play[i]] = true;
     }

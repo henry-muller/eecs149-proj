@@ -2,6 +2,7 @@
 #define TYPES_H
 
 #define NUMBER_OF_NOTE_INDICES 8
+#define NUMBER_OF_NOTES 27
 
 typedef enum {
     B3,

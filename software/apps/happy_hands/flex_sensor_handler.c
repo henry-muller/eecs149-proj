@@ -80,7 +80,7 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
 #define S89_SEL NRF_GPIO_PIN_MAP(0, 9) //pin 11*/
 
 
-static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS];
+static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS] = {2600, 2600, 2600, 2600, 2600, 2600, 2600, 2600, 2600, 2600};
 
 static nrf_saadc_value_t get_sensor_value(int sensor) {
     nrf_saadc_value_t result = 0;
@@ -131,7 +131,7 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
 
 static bool is_above_threshold(int sensor_number, nrf_saadc_value_t sensor_value) {
     // printf("Threshold for sensor %d is %d\n", sensor_number, flex_sensor_thresholds[sensor_number]);
-    return sensor_value >= 0.9 * flex_sensor_thresholds[sensor_number];
+    return sensor_value >= THRESHOLD_SLACK_FACTOR * flex_sensor_thresholds[sensor_number];
 }
 
 void update_flex_sensor_thresholds() {

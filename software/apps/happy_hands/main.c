@@ -61,7 +61,30 @@ int main(void) {
 
 
     // Calibrate sensors
-    //initialize_flex_sensors();
+    initialize_flex_sensors();
+    update_flex_sensor_thresholds();
+    initialize_rotary_switch();
+    instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    i2s_instrument_init();
+    int i;
+    while(1) {
+        // for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+        //     printf("%d ", is_sensor_flexed(i));
+        // }
+        // printf("%d\n", get_rotary_switch_position());
+        update_instrument_state(&instrument_state);
+        i2s_instrument_play(&instrument_state);
+    }
+
+
+    // int i;
+    // while(1) {
+    //     for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+    //         printf("%d ", is_sensor_flexed(i));
+    //     }
+    //     printf("\n");
+    //     //nrf_delay_ms(100);
+    // }
     //update_flex_sensor_thresholds();
     //initialize_rotary_switch();
     //int i;
@@ -85,13 +108,17 @@ int main(void) {
     //nrf_gpio_pin_clear(S89_SEL);
 
 
-    //initialize_rotary_switch();
+    // initialize_rotary_switch();
+    // while(1) {
+    //     printf("%d\n", get_rotary_switch_position());
+    //     //printf("%d\n", sample_adc_value(0));
+    // }
     
-    instrument_state_t instrument_state = {{C4, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
-    i2s_instrument_init();
-    while(1) {
-        i2s_instrument_play(&instrument_state);
-    }
+    // instrument_state_t instrument_state = {{C4, E4, G4, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
+    // i2s_instrument_init();
+    // while(1) {
+    //      i2s_instrument_play(&instrument_state);
+    // }
     //instrument_state.notes_to_play[0] = C4;
     // bool add_G4 = false;
     // while(1) {

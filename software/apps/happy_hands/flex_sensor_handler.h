@@ -58,6 +58,8 @@
 // ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
 // ADC_OUTPUT = V * 1137.778
 
+#define THRESHOLD_SLACK_FACTOR 0.98
+
 void update_flex_sensor_thresholds();
 
 bool is_sensor_flexed(int sensor_number);
