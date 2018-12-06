@@ -179,5 +179,13 @@ void initialize_flex_sensors() {
 }
 
 bool is_sensor_flexed(int sensor_number) {
-    return is_above_threshold(sensor_number, get_sensor_value(sensor_number));
+    nrf_saadc_value_t sum = 0;
+    int count = 10;
+    int i;
+    for (i = 0; i < count; i++) {
+        sum += get_sensor_value(sensor_number);
+    }
+    // printf("sum/count = %d\n", sum/count);
+    // printf("is above th: %d\n", is_above_threshold(sensor_number, (nrf_saadc_value_t) (sum/count)));
+    return is_above_threshold(sensor_number, (nrf_saadc_value_t) (sum/count));
 }
