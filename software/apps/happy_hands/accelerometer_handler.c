@@ -20,11 +20,20 @@
 #define ACCELEROMETER_INPUT_PIN NRF_SAADC_INPUT_AIN7
 #define ACCELEROMETER_ADC_CHANNEL 7
 
+// static int count = 0;
+// static nrf_saadc_value_t last_value;
+
 nrf_saadc_value_t get_accelerometer_adc() {
-    nrf_saadc_value_t adc_value = sample_adc_value(ACCELEROMETER_ADC_CHANNEL);
-    return adc_value;
+    // if (count == 100) {
+    return sample_adc_value(ACCELEROMETER_ADC_CHANNEL);
+    //     last_value = adc_value;
+    //     count = 0;
+    // } else {
+    //     count++;
+    // }
+    // return last_value;
 }
 
 void initialize_accelerometer() {
-    initialize_adc_channel(ACCELEROMETER_INPUT_PIN, ACCELEROMETER_ADC_CHANNEL);
+    initialize_adc_channel_with_limits(ACCELEROMETER_INPUT_PIN, ACCELEROMETER_ADC_CHANNEL, 1400, 1800);
 }

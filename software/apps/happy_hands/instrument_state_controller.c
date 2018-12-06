@@ -17,7 +17,7 @@
 #include "sensor_to_instrument_interface.h"
 
 #define MIN_VOLUME 0
-#define MAX_VOLUME 5
+#define MAX_VOLUME 3
 
 static musical_key_t key;
 

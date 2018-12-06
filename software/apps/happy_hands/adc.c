@@ -14,13 +14,25 @@
 #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
 
+#include "accelerometer_handler.h"
+
 #define ADC_SCALING_FACTOR 1137.778 // See page 358 of nRF52832 Product Specification for details
 // ADC_OUTPUT =  [V(P) – V(N)] * GAIN/REFERENCE * 2^(RESOLUTION - m)
 // ADC_OUTPUT = V * 1137.778
 
 static nrf_saadc_channel_config_t adc_channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
 
-static void saadc_callback(nrfx_saadc_evt_t const * p_event) {} // don't care about SAADC callbacks
+static void saadc_callback(nrfx_saadc_evt_t const * p_event) {
+    if (p_event->type == NRFX_SAADC_EVT_LIMIT && p_event->data.limit.channel == ACCELEROMETER_ADC_CHANNEL) {
+        if (p_event->data.limit.limit_type == NRF_SAADC_LIMIT_LOW) {
+            printf("Low Interrupt\n");
+            //handle_accelerometer_low();
+        } else {
+            //handle_accelerometer_high();
+            printf("High Interrupt\n");
+        }
+    }
+}
 
 static bool _is_adc_initialized = false;
 
@@ -40,6 +52,11 @@ void initialize_adc_channel(nrf_saadc_input_t pin, uint8_t channel) {
     adc_channel_config.pin_p = pin;
     ret_code_t error_code = nrfx_saadc_channel_init(channel, &adc_channel_config);
     APP_ERROR_CHECK(error_code);
+}
+
+void initialize_adc_channel_with_limits(nrf_saadc_input_t pin, uint8_t channel, int16_t limit_low, int16_t limit_high) {
+    initialize_adc_channel(pin, channel);
+    nrfx_saadc_limits_set(channel, limit_low, limit_high);
 }
 
 // Sample a particular analog channel in blocking mode

@@ -21,6 +21,7 @@
 #include "flex_sensor_handler.h"
 #include "i2s_instrument.h"
 #include "rotary_switch_handler.h"
+#include "accelerometer_handler.h"
 #include "instrument_state_controller.h"
 #include "sensor_to_instrument_interface.h"
 
@@ -62,18 +63,23 @@ int main(void) {
 
     // Calibrate sensors
     initialize_flex_sensors();
-    update_flex_sensor_thresholds();
+    //update_flex_sensor_thresholds();
     initialize_rotary_switch();
+    //initialize_accelerometer();
     instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
     i2s_instrument_init();
-    int i;
+    //int i;
     while(1) {
         // for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-        //     printf("%d ", is_sensor_flexed(i));
+        //   printf("%d ",  get_sensor_value(i));
         // }
+        // printf("\n");
         // printf("%d\n", get_rotary_switch_position());
+        //printf("vol: %d\n", instrument_state.volume_level);
+        //printf("acc: %d\n", get_accelerometer_adc());
         update_instrument_state(&instrument_state);
         i2s_instrument_play(&instrument_state);
+        //nrf_delay_ms(10);
     }
 
 
