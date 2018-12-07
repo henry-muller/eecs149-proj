@@ -115,16 +115,13 @@ static void update_notes_to_play(instrument_state_t* state) {
 static void update_volume_level(instrument_state_t* state) {
     volume_command_t volume_command = get_volume_command();
     switch(volume_command) {
-        case DOWN:
-            if (state->volume_level > MIN_VOLUME) {
-                state->volume_level--;
-            }
-            break;
         case HOLD:
             break;
-        case UP:
+        case RAISE:
             if (state->volume_level < MAX_VOLUME) {
                 state->volume_level++;
+            } else {
+                state->volume_level = MIN_VOLUME;
             }
             break;
     }

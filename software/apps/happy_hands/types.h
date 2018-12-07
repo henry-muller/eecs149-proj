@@ -60,9 +60,8 @@ typedef enum {
 } musical_key_t;
 
 typedef enum {
-    DOWN,
     HOLD,
-    UP
+    RAISE
 } volume_command_t;
 
 typedef struct {

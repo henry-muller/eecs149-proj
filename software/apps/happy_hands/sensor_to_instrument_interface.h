@@ -22,7 +22,7 @@ bool is_note_index_input_present(int note_index);
 
 pitch_bend_t get_pitch_bend();
 
-void set_volume_command(volume_command_t cmd);
+void raise_volume();
 
 volume_command_t get_volume_command();
 

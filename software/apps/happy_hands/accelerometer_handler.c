@@ -22,8 +22,8 @@
 
 #define ACCELEROMETER_INPUT_PIN NRF_SAADC_INPUT_AIN7
 #define ACCELEROMETER_ADC_CHANNEL 7
-#define ACC_ADC_LOW 1300
-#define ACC_ADC_HIGH 1800
+#define ACC_ADC_LOW 1000
+#define ACC_ADC_HIGH 2000
 #define ACC_TIMER_MS 2000
 
 static bool is_accelerometer_initialized = false;
@@ -46,13 +46,9 @@ nrf_saadc_value_t get_accelerometer_adc() {
     return sample_adc_value(ACCELEROMETER_ADC_CHANNEL);
 }
 
-void handle_accelerometer_interrupt(bool is_low) {
+void handle_accelerometer_interrupt() {
     NRFX_IRQ_DISABLE(SAADC_IRQn);
-    if(is_low) {
-        set_volume_command(DOWN);
-    } else {
-        set_volume_command(UP);
-    }
+    raise_volume();
     APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(ACC_TIMER_MS), NULL));
 }
 

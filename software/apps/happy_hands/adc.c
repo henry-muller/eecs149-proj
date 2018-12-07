@@ -26,13 +26,8 @@ static void saadc_callback(nrfx_saadc_evt_t const * p_event) {
     // NRFX_IRQ_DISABLE(SAADC_IRQn);
     //printf("IRQ\n");
     if (p_event->type == NRFX_SAADC_EVT_LIMIT && p_event->data.limit.channel == ACCELEROMETER_ADC_CHANNEL) {
-        if (p_event->data.limit.limit_type == NRF_SAADC_LIMIT_LOW) {
-            printf("Low Interrupt\n");
-            handle_accelerometer_interrupt(true);
-        } else {
-            printf("High Interrupt\n");
-            handle_accelerometer_interrupt(false);
-        }
+        printf("Limit Interrupt\n");
+        handle_accelerometer_interrupt();
     }
     // NRFX_IRQ_ENABLE(SAADC_IRQn);
    //printf("Done with IRQ\n");

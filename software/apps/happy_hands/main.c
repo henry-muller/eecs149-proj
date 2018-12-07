@@ -31,7 +31,7 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
-bool demo_mode = false;
+bool demo_mode = true;
 
 // APP_TIMER_DEF(acc_timer);
 // static void acc_timer_handler(void *p_context) {
@@ -54,19 +54,20 @@ int main(void) {
     if (demo_mode) {
         initialize_adc();
         initialize_flex_sensors();
-        //initialize_accelerometer();
-        //update_flex_sensor_thresholds();
+        initialize_accelerometer();
+        update_flex_sensor_thresholds();
         initialize_rotary_switch();
         instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
         i2s_instrument_init();
-        //int i;
+        int i;
         while(1) {
             //get_accelerometer_adc();
 
-            // for (i = 0; i < NUMBER_OF_SENSORS; i++) {
-            // printf("%d ",  get_sensor_value(i));
-            // }
-            // printf("\n");
+            for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+            printf("%d ",  is_sensor_flexed(i));
+            }
+            printf("\n");
+            printf("%d\n", get_accelerometer_adc());
             update_instrument_state(&instrument_state);
             i2s_instrument_play(&instrument_state);
         }

@@ -123,7 +123,7 @@ static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
 
 static bool is_buffer_1_tx = false;
 static bool swing = true;
-static int shrink = 5; // Don't let me forget to use this HAHAHAHAHAHA KMS
+static int shrink = 5; 
 
 int16_t get_next_note_in_array(musical_note_t note) {
     const int16_t* note_array = note_arrays[note];
@@ -305,16 +305,16 @@ void i2s_instrument_play(instrument_state_t *state) {
     }
     switch(state->volume_level) {
         case 0:
-            shrink = 8;
+            shrink = 10;
             break;
         case 1:
-            shrink = 7;
+            shrink = 8;
             break;
         case 2:
             shrink = 6;
             break;
         case 3:
-            shrink = 5;
+            shrink = 4;
             break;
     }
     //printf("line 251\n");
