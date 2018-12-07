@@ -408,7 +408,7 @@ nrfx_err_t nrfx_saadc_sample_convert(uint8_t channel, nrf_saadc_value_t * p_valu
 
     bool result;
     NRFX_WAIT_FOR(nrf_saadc_event_check(NRF_SAADC_EVENT_END), HW_TIMEOUT, 0, result);
-    NRFX_ASSERT(result);
+    //NRFX_ASSERT(result);
 
     nrf_saadc_event_clear(NRF_SAADC_EVENT_STARTED);
     nrf_saadc_event_clear(NRF_SAADC_EVENT_END);
