@@ -22,6 +22,9 @@
 
 #define ACCELEROMETER_INPUT_PIN NRF_SAADC_INPUT_AIN7
 #define ACCELEROMETER_ADC_CHANNEL 7
+#define ACC_ADC_LOW 1300
+#define ACC_ADC_HIGH 1800
+#define ACC_TIMER_MS 2000
 
 static bool is_accelerometer_initialized = false;
 
@@ -50,12 +53,12 @@ void handle_accelerometer_interrupt(bool is_low) {
     } else {
         set_volume_command(UP);
     }
-    APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(2000), NULL));
+    APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(ACC_TIMER_MS), NULL));
 }
 
 void initialize_accelerometer() {
     if(!is_accelerometer_initialized) {
-        initialize_adc_channel_with_limits(ACCELEROMETER_INPUT_PIN, ACCELEROMETER_ADC_CHANNEL, 1500, 1800);
+        initialize_adc_channel_with_limits(ACCELEROMETER_INPUT_PIN, ACCELEROMETER_ADC_CHANNEL, ACC_ADC_LOW, ACC_ADC_HIGH);
         low_frequency_clk_request();
         app_timer_init();
         APP_ERROR_CHECK(app_timer_create(&acc_timer, APP_TIMER_MODE_SINGLE_SHOT, acc_timer_handler));

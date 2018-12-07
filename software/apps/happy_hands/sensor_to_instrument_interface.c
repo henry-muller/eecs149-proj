@@ -68,6 +68,7 @@ void set_volume_command(volume_command_t cmd) {
 }
 
 volume_command_t get_volume_command() {
+    get_accelerometer_adc(); // This has to be here because if we don't sample from the ADC it will never trigger interrupts.
     if (volume_command != HOLD) {
         volume_command_t old_command = volume_command;
         volume_command = HOLD; // Avoid returning non-HOLD twice in a row
