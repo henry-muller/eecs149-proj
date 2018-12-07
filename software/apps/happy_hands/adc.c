@@ -23,19 +23,20 @@
 static nrf_saadc_channel_config_t adc_channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
 
 static void saadc_callback(nrfx_saadc_evt_t const * p_event) {
-//    printf("IRQ\n");
-    NRFX_IRQ_DISABLE(SAADC_IRQn);
+
+   printf("IRQ\n");
+    // NRFX_IRQ_DISABLE(SAADC_IRQn);
     if (p_event->type == NRFX_SAADC_EVT_LIMIT && p_event->data.limit.channel == ACCELEROMETER_ADC_CHANNEL) {
         if (p_event->data.limit.limit_type == NRF_SAADC_LIMIT_LOW) {
-//            printf("Low Interrupt\n");
+            //printf("Low Interrupt\n");
             //handle_accelerometer_low();
         } else {
             //handle_accelerometer_high();
-//            printf("High Interrupt\n");
+           //printf("High Interrupt\n");
         }
     }
-    NRFX_IRQ_ENABLE(SAADC_IRQn);
-//    printf("Done with IRQ\n");
+    // NRFX_IRQ_ENABLE(SAADC_IRQn);
+   //printf("Done with IRQ\n");
 }
 
 static bool _is_adc_initialized = false;

@@ -80,6 +80,8 @@ BOARD_SOURCES += \
 	ff.c\
 	mmc_nrf.c\
 	nrfx_i2s.c\
+	nrf_drv_clock.c\
+	nrfx_clock.c\
 
 ifneq ($(SOFTDEVICE_MODEL),blank)
 BOARD_SOURCES += nrf_sdh.c

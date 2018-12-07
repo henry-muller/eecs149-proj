@@ -17,7 +17,7 @@
 #include "nrf_drv_i2s.h"
 
 #include "types.h"
-#include "piano.h"
+#include "cello.h"
 
 #define SCK_PIN 14 // same as BCK
 #define LRCK_PIN 15

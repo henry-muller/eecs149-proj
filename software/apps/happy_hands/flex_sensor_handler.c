@@ -80,10 +80,10 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
 #define S89_SEL NRF_GPIO_PIN_MAP(0, 9) //pin 11*/
 
 
-static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS] = {2800, 2500, 2700, 2700, 2430, 2300, 2400, 2300, 2600, 2600};
+static nrf_saadc_value_t flex_sensor_thresholds[NUMBER_OF_SENSORS] = {2800, 2500, 2700, 2400, 2900, 2300, 2400, 2300, 2600, 2600};
 
 
-static nrf_saadc_value_t get_sensor_value(int sensor) {
+ nrf_saadc_value_t get_sensor_value(int sensor) {
     nrf_saadc_value_t result = 0;
     switch(sensor) {
         case 0:
