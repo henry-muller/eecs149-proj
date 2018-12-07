@@ -33,11 +33,11 @@ ret_code_t initialize_rtt() {
 
 bool demo_mode = false;
 
-APP_TIMER_DEF(acc_timer);
-static void acc_timer_handler(void *p_context) {
-    printf("Timer Fired\n");
-    APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(200), NULL));
-}
+// APP_TIMER_DEF(acc_timer);
+// static void acc_timer_handler(void *p_context) {
+//     printf("Timer Fired\n");
+//     APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(200), NULL));
+// }
 
 int main(void) { 
     // initialize RTT library
@@ -71,19 +71,23 @@ int main(void) {
             i2s_instrument_play(&instrument_state);
         }
     } else {
-        //initialize_adc();
-        //initialize_accelerometer();
+        initialize_adc();
+        initialize_accelerometer();
+        instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
         //instrument_state_t instrument_state = {{NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE, NO_NOTE}, 2};
         //update_instrument_state(&instrument_state);
-        APP_ERROR_CHECK(nrf_drv_clock_init());
-        nrf_drv_clock_lfclk_request(NULL);
-        app_timer_init();
-        APP_ERROR_CHECK(app_timer_create(&acc_timer, APP_TIMER_MODE_SINGLE_SHOT, acc_timer_handler));
-        APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(200), NULL));
+        // APP_ERROR_CHECK(nrf_drv_clock_init());
+        // nrf_drv_clock_lfclk_request(NULL);
+        // app_timer_init();
+        // APP_ERROR_CHECK(app_timer_create(&acc_timer, APP_TIMER_MODE_SINGLE_SHOT, acc_timer_handler));
+        // APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(200), NULL));
         while(1) {
             //printf("vol: %d\n", instrument_state.volume_level);
             //if(!nrfx_saadc_is_busy()) {
-                //get_accelerometer_adc();
+                get_accelerometer_adc();
+                update_instrument_state(&instrument_state);
+                printf("vol: %d\n", instrument_state.volume_level);
+                //printf("%d", get_accelerometer_adc());
             //}
             // get_accelerometer_adc();
         }

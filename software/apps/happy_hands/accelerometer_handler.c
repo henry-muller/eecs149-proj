@@ -15,9 +15,10 @@
 #include "nrfx_saadc.h"
 #include "app_timer.h"
 #include "nrf_drv_clock.h"
-
 #include "buckler.h"
+
 #include "adc.h"
+#include "sensor_to_instrument_interface.h"
 
 #define ACCELEROMETER_INPUT_PIN NRF_SAADC_INPUT_AIN7
 #define ACCELEROMETER_ADC_CHANNEL 7
@@ -27,6 +28,9 @@ static bool is_accelerometer_initialized = false;
 APP_TIMER_DEF(acc_timer);
 
 static void acc_timer_handler(void *p_context) {
+    printf("Timer Fired\n");
+    nrf_saadc_event_clear(NRF_SAADC_EVENT_CH7_LIMITH);
+    nrf_saadc_event_clear(NRF_SAADC_EVENT_CH7_LIMITL);
     NRFX_IRQ_ENABLE(SAADC_IRQn);
 }
 
@@ -36,25 +40,22 @@ static void low_frequency_clk_request() {
 }
 
 nrf_saadc_value_t get_accelerometer_adc() {
-    // if (count == 100) {
     return sample_adc_value(ACCELEROMETER_ADC_CHANNEL);
-    //     last_value = adc_value;
-    //     count = 0;
-    // } else {
-    //     count++;
-    // }
-    // return last_value;
 }
 
-void handle_accelerometer_low() {
-    // something with state controller
+void handle_accelerometer_interrupt(bool is_low) {
     NRFX_IRQ_DISABLE(SAADC_IRQn);
+    if(is_low) {
+        set_volume_command(DOWN);
+    } else {
+        set_volume_command(UP);
+    }
     APP_ERROR_CHECK(app_timer_start(acc_timer, APP_TIMER_TICKS(2000), NULL));
 }
 
 void initialize_accelerometer() {
     if(!is_accelerometer_initialized) {
-        initialize_adc_channel_with_limits(ACCELEROMETER_INPUT_PIN, ACCELEROMETER_ADC_CHANNEL, 1400, 1800);
+        initialize_adc_channel_with_limits(ACCELEROMETER_INPUT_PIN, ACCELEROMETER_ADC_CHANNEL, 1500, 1800);
         low_frequency_clk_request();
         app_timer_init();
         APP_ERROR_CHECK(app_timer_create(&acc_timer, APP_TIMER_MODE_SINGLE_SHOT, acc_timer_handler));

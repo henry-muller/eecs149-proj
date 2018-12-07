@@ -25,6 +25,8 @@
 
 nrf_saadc_value_t get_accelerometer_adc();
 
+void handle_accelerometer_interrupt(bool is_low);
+
 void initialize_accelerometer();
 
 #endif /*  ACCELEROMETER_HANDLER_H */
