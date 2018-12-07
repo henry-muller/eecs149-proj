@@ -31,7 +31,7 @@ ret_code_t initialize_rtt() {
     return error_code;
 }
 
-bool demo_mode = true;
+bool demo_mode = false;
 
 int main(void) { 
     // initialize RTT library
@@ -62,8 +62,10 @@ int main(void) {
     } else {
         initialize_accelerometer();
         while(1) {
-            printf("vol: %d\n", instrument_state.volume_level);
-            printf("acc: %d\n", get_accelerometer_adc());
+            get_accelerometer_adc();
+            // nrf_delay_ms(1);
+            //printf("vol: %d\n", instrument_state.volume_level);
+            //printf("acc: %d\n", get_accelerometer_adc());
         }
     }
 }
