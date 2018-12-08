@@ -3,18 +3,18 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
+// #include <stdio.h>
 
-#include "app_error.h"
-#include "nrf.h"
-#include "nrf_delay.h"
-#include "nrf_gpio.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-#include "nrf_pwr_mgmt.h"
-#include "nrf_serial.h"
-#include "nrfx_gpiote.h"
+// #include "app_error.h"
+// #include "nrf.h"
+// #include "nrf_delay.h"
+// #include "nrf_gpio.h"
+// #include "nrf_log.h"
+// #include "nrf_log_ctrl.h"
+// #include "nrf_log_default_backends.h"
+// #include "nrf_pwr_mgmt.h"
+// #include "nrf_serial.h"
+// #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
 
 bool is_adc_initialized();

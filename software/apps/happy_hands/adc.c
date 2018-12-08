@@ -3,15 +3,15 @@
 #include <stdio.h>
 
 #include "app_error.h"
-#include "nrf.h"
-#include "nrf_delay.h"
-#include "nrf_gpio.h"
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-#include "nrf_pwr_mgmt.h"
-#include "nrf_serial.h"
-#include "nrfx_gpiote.h"
+// #include "nrf.h"
+// #include "nrf_delay.h"
+// #include "nrf_gpio.h"
+// #include "nrf_log.h"
+// #include "nrf_log_ctrl.h"
+// #include "nrf_log_default_backends.h"
+// #include "nrf_pwr_mgmt.h"
+// #include "nrf_serial.h"
+// #include "nrfx_gpiote.h"
 #include "nrfx_saadc.h"
 
 #include "accelerometer_handler.h"
@@ -23,14 +23,10 @@
 static nrf_saadc_channel_config_t adc_channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(0);
 
 static void saadc_callback(nrfx_saadc_evt_t const * p_event) {
-    // NRFX_IRQ_DISABLE(SAADC_IRQn);
-    //printf("IRQ\n");
     if (p_event->type == NRFX_SAADC_EVT_LIMIT && p_event->data.limit.channel == ACCELEROMETER_ADC_CHANNEL) {
         printf("Limit Interrupt\n");
         handle_accelerometer_interrupt();
     }
-    // NRFX_IRQ_ENABLE(SAADC_IRQn);
-   //printf("Done with IRQ\n");
 }
 
 static bool _is_adc_initialized = false;

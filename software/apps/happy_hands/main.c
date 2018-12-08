@@ -1,29 +1,30 @@
 #include <stdbool.h>
-#include <stdint.h>
+// #include <stdint.h>
 #include <stdio.h>
 
-#include "app_error.h"
-#include "nrf.h"
-#include "nrf_delay.h"
-#include "nrf_gpio.h"
+// #include "app_error.h"
+// #include "nrf.h"
+// #include "nrf_delay.h"
+// #include "nrf_gpio.h"
+#include "nrf_drv_uart.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-#include "nrf_pwr_mgmt.h"
-#include "nrf_serial.h"
-#include "nrfx_gpiote.h"
-#include "nrfx_saadc.h"
-#include "app_timer.h"
-#include "nrf_drv_clock.h"
+// #include "nrf_pwr_mgmt.h"
+// #include "nrf_serial.h"
+// #include "nrfx_gpiote.h"
+// #include "nrfx_saadc.h"
+// #include "app_timer.h"
+// #include "nrf_drv_clock.h"
+// #include "buckler.h"
 
-#include "buckler.h"
 #include "adc.h"
 #include "flex_sensor_handler.h"
 #include "i2s_instrument.h"
 #include "rotary_switch_handler.h"
 #include "accelerometer_handler.h"
 #include "instrument_state_controller.h"
-#include "sensor_to_instrument_interface.h"
+// #include "sensor_to_instrument_interface.h"
 
 ret_code_t initialize_rtt() {
     ret_code_t error_code = NRF_LOG_INIT(NULL);
@@ -63,7 +64,7 @@ int main(void) {
         while(1) {
             //get_accelerometer_adc();
 
-            for (i = 0; i < NUMBER_OF_SENSORS; i++) {
+            for (i = 0; i < 10; i++) {
             printf("%d ",  is_sensor_flexed(i));
             }
             printf("\n");
