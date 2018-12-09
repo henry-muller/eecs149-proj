@@ -3,15 +3,6 @@
 #include <stdio.h>
 
 #include "app_error.h"
-// #include "nrf.h"
-// #include "nrf_delay.h"
-// #include "nrf_gpio.h"
-// #include "nrf_log.h"
-// #include "nrf_log_ctrl.h"
-// #include "nrf_log_default_backends.h"
-// #include "nrf_pwr_mgmt.h"
-// #include "nrf_serial.h"
-// #include "nrfx_gpiote.h"
 #include "nrf_i2s.h"
 #include "nrfx_i2s.h"
 #include "nrf_drv_i2s.h"
@@ -122,7 +113,7 @@ static int16_t tx_buffer_0[BUFFER_LENGTH] = {0};
 static int16_t tx_buffer_1[BUFFER_LENGTH] = {0};
 
 static bool is_buffer_1_tx = false;
-static bool swing = true;
+static bool swing = true; // Use a double-buffer swing system to avoid sound corruption. You can hear the difference!
 static int shrink = 5; 
 
 int16_t get_next_note_in_array(musical_note_t note) {
@@ -135,7 +126,6 @@ int16_t get_next_note_in_array(musical_note_t note) {
 }
 
 static void update_tx_buffer(int16_t *buffer) {
-    //printf("update_tx_buffer called\n");
     int i;
     for (i = 0; i < BUFFER_LENGTH; i++) {
         buffer[i] = 0;
@@ -218,17 +208,11 @@ static void update_tx_buffer(int16_t *buffer) {
             buffer[i] += get_next_note_in_array(C6);
         }
     }
-    // int i;
-    // for (i = 0; i < BUFFER_LENGTH; i++) {
-    //     buffer[i] = get_next_note_in_array(C4)/50 + get_next_note_in_array(E4)/50;// + get_next_note_in_array(G4)/10;
-    //     printf("%d\n", buffer[i]);
-    // }
 }
 
 static nrfx_i2s_buffers_t i2s_buffers = {NULL, (uint32_t*) tx_buffer_0};
 
 static void data_handler(nrfx_i2s_buffers_t const *p_released, uint32_t status) {
-    //printf("data_handler called\n");
     if(swing) {
         is_buffer_1_tx  = !is_buffer_1_tx;
         i2s_buffers.p_tx_buffer = (uint32_t*) (is_buffer_1_tx ? tx_buffer_0 : tx_buffer_1);
@@ -248,11 +232,7 @@ void i2s_instrument_init() {
     config.mck_setup = NRF_I2S_MCK_32MDIV11; // 2.909 MHz
     config.ratio = NRF_I2S_RATIO_32X; // Divide by 32
     APP_ERROR_CHECK(nrfx_i2s_init(&config, data_handler));
-    //printf("In\n");
-    //nrfx_err_t start_err_code;
     nrfx_i2s_start(&i2s_buffers, BUFFER_LENGTH/2, 0);
-    //printf("nrfx_i2s_start error code: %ld\n", start_err_code);
-    //printf("Out\n");
 }
 
 void i2s_instrument_init_hal() {
@@ -317,8 +297,6 @@ void i2s_instrument_play(instrument_state_t *state) {
             shrink = 2;
             break;
     }
-    //printf("line 251\n");
-    //nrf_delay_ms(1000);
 }
 
 static void play_wave_hal(musical_note_t note) {
@@ -326,16 +304,8 @@ static void play_wave_hal(musical_note_t note) {
     NRF_I2S->RXTXD.MAXCNT = (int)(note_lengths[note]/2);
 }
 
-// static void play_wave(int16_t wave_array[], size_t array_size) {
-//     // Configure data pointer
-//     NRF_I2S->TXD.PTR = (uint32_t)wave_array;
-//     NRF_I2S->RXTXD.MAXCNT = (int)(array_size/2);
-// }
-
 void i2s_instrument_play_hal(instrument_state_t *state) {
-    //printf("In play fn\n");
     int i = 0;
-    //bool still_looking = true;
     while (i < NUMBER_OF_NOTE_INDICES) {
         if (state->notes_to_play[i]!= NO_NOTE) {
             printf("note: %d\n", state->notes_to_play[i]);
@@ -347,10 +317,4 @@ void i2s_instrument_play_hal(instrument_state_t *state) {
         }
         i++;
     }
-
-    //play_wave_hal(B3);
-    //play_wave_hal(G4_FLAT_array, ARRAY_SIZE(G4_FLAT_array));
-    //NRF_I2S->TXD.PTR = (uint32_t)C4_array;
-    //NRF_I2S->RXTXD.MAXCNT = C4_LENGTH/2;
-    //play_wave(B3_array, ARRAY_SIZE(B3_array));
 }

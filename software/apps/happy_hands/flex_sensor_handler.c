@@ -1,42 +1,34 @@
 #include <stdbool.h>
-// #include <stdint.h>
+#include <stdint.h>
 #include <stdio.h>
 
-// #include "app_error.h"
-// #include "nrf.h"
 #include "nrf_delay.h"
 #include "nrf_gpio.h"
-// #include "nrf_log.h"
-// #include "nrf_log_ctrl.h"
-// #include "nrf_log_default_backends.h"
-// #include "nrf_pwr_mgmt.h"
-// #include "nrf_serial.h"
 #include "nrfx_gpiote.h"
-// #include "buckler.h"
 
 #include "adc.h"
 #include "flex_sensor_handler.h"
 
 #define NUMBER_OF_SENSORS 10
 
-#define SENSOR_01_INPUT_PIN NRF_SAADC_INPUT_AIN2 //left pink and ring
-#define SENSOR_23_INPUT_PIN NRF_SAADC_INPUT_AIN3 //left middle and pointer
-#define SENSOR_4_INPUT_PIN NRF_SAADC_INPUT_AIN1 //left thumb
-#define SENSOR_5_INPUT_PIN NRF_SAADC_INPUT_AIN6 //right thumb
+#define SENSOR_01_INPUT_PIN NRF_SAADC_INPUT_AIN2 // left pinky and ring
+#define SENSOR_23_INPUT_PIN NRF_SAADC_INPUT_AIN3 // left middle and pointer
+#define SENSOR_4_INPUT_PIN NRF_SAADC_INPUT_AIN1 // left thumb
+#define SENSOR_5_INPUT_PIN NRF_SAADC_INPUT_AIN6 // right thumb
 #define SENSOR_67_INPUT_PIN NRF_SAADC_INPUT_AIN4 // right pointer and middle
 #define SENSOR_89_INPUT_PIN NRF_SAADC_INPUT_AIN5 // right ring and pinky
 
-#define SENSOR_01_ADC_CHANNEL 2 //left pink and ring
-#define SENSOR_23_ADC_CHANNEL 3 //left middle and pointer
-#define SENSOR_4_ADC_CHANNEL 1 //left thumb
-#define SENSOR_5_ADC_CHANNEL 6 //right thumb
+#define SENSOR_01_ADC_CHANNEL 2 // left pinky and ring
+#define SENSOR_23_ADC_CHANNEL 3 // left middle and pointer
+#define SENSOR_4_ADC_CHANNEL 1 // left thumb
+#define SENSOR_5_ADC_CHANNEL 6 // right thumb
 #define SENSOR_67_ADC_CHANNEL 4 // right pointer and middle
 #define SENSOR_89_ADC_CHANNEL 5 // right ring and pinky
 
-#define S01_SEL NRF_GPIO_PIN_MAP(0,6) //pin 8
-#define S23_SEL NRF_GPIO_PIN_MAP(0,7) //pin 9
-#define S67_SEL NRF_GPIO_PIN_MAP(0,8) //pin 10
-#define S89_SEL NRF_GPIO_PIN_MAP(0,11) //pin 11
+#define S01_SEL NRF_GPIO_PIN_MAP(0,6) // pin 8
+#define S23_SEL NRF_GPIO_PIN_MAP(0,7) // pin 9
+#define S67_SEL NRF_GPIO_PIN_MAP(0,8) // pin 10
+#define S89_SEL NRF_GPIO_PIN_MAP(0,11) // pin 11
 
 #define THRESHOLD_SLACK_FACTOR 0.98
 
@@ -81,16 +73,13 @@ static nrf_saadc_value_t get_sensor_value(int sensor) {
             break;
         case 9:
             nrf_gpio_pin_clear(S89_SEL);
-            //nrf_delay_ms(1);
             result = sample_adc_value(SENSOR_89_ADC_CHANNEL);
             break;
     }
-    // printf("According to sample_adc_value, sensor %d reading is %d\n", sensor, result);
     return result;
 }
 
 static bool is_above_threshold(int sensor_number, nrf_saadc_value_t sensor_value) {
-    // printf("Threshold for sensor %d is %d\n", sensor_number, flex_sensor_thresholds[sensor_number]);
     return sensor_value >= THRESHOLD_SLACK_FACTOR * flex_sensor_thresholds[sensor_number];
 }
 
