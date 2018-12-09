@@ -24,7 +24,7 @@
 #define ACCELEROMETER_ADC_CHANNEL 7
 #define ACC_ADC_LOW 1000
 #define ACC_ADC_HIGH 2000
-#define ACC_TIMER_MS 2000
+#define ACC_TIMER_MS 1000
 
 static bool is_accelerometer_initialized = false;
 
