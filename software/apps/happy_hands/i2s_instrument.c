@@ -305,16 +305,16 @@ void i2s_instrument_play(instrument_state_t *state) {
     }
     switch(state->volume_level) {
         case 0:
-            shrink = 10;
+            shrink = 16;
             break;
         case 1:
             shrink = 8;
             break;
         case 2:
-            shrink = 6;
+            shrink = 4;
             break;
         case 3:
-            shrink = 4;
+            shrink = 2;
             break;
     }
     //printf("line 251\n");

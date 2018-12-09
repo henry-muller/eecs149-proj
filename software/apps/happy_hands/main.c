@@ -69,6 +69,7 @@ int main(void) {
             }
             printf("\n");
             printf("%d\n", get_accelerometer_adc());
+            printf("VOLUME LEVEL: %d\n", instrument_state.volume_level);
             update_instrument_state(&instrument_state);
             i2s_instrument_play(&instrument_state);
         }
